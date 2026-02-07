@@ -2,55 +2,813 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>LifeHub · Choose a Hub</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="./styles.css" />
+  <title>LifeHub</title>
+  <style>
+    :root{
+      --bg:#f7f5fb;
+      --card:#ffffff;
+      --text:#1f2933;
+      --muted:#6b7280;
+      --accent:#b9c6ff;
+      --accent2:#ffd6e8;
+      --accent3:#c9f2e7;
+      --soft:#eef2ff;
+      --border:#e5e7eb;
+      --shadow:0 8px 18px rgba(0,0,0,.06);
+      --radius:14px;
+    }
+    *{box-sizing:border-box;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+    body{margin:0;background:var(--bg);color:var(--text)}
+    a{color:inherit;text-decoration:none}
+    header{
+      background:linear-gradient(135deg,#c7d2ff,#ffe0f0);
+      padding:14px 16px;
+      box-shadow:var(--shadow);
+      position:sticky;top:0;z-index:50;
+    }
+    .header-inner{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+    .title h1{margin:0;font-size:1.1rem;letter-spacing:.02em}
+    .title p{margin:2px 0 0;font-size:.85rem;color:var(--muted)}
+    nav{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    nav button{
+      border:0;border-radius:999px;padding:8px 12px;
+      background:rgba(255,255,255,.75);cursor:pointer;
+      font-size:.85rem;transition:transform .15s ease, box-shadow .15s ease;
+      display:flex;align-items:center;gap:6px;color:var(--text)
+    }
+    nav button.active{background:var(--card);box-shadow:var(--shadow)}
+    nav button:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
+    main{max-width:1100px;margin:16px auto 40px;padding:0 14px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+    .card{
+      background:var(--card);border-radius:var(--radius);padding:14px;
+      box-shadow:var(--shadow);border:1px solid rgba(0,0,0,.03)
+    }
+    .card h2{margin:0 0 8px;font-size:1rem;display:flex;align-items:center;gap:8px}
+    .sub{margin:0 0 10px;font-size:.82rem;color:var(--muted)}
+    .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .pill{display:inline-flex;gap:6px;align-items:center;padding:2px 8px;border-radius:999px;background:var(--soft);font-size:.72rem;color:var(--muted)}
+    .tag-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+    .tag{font-size:.75rem;padding:2px 8px;border-radius:999px;background:#f3f4ff;color:#4b5563}
+    input,select,textarea{
+      width:100%;padding:8px 9px;border-radius:10px;border:1px solid var(--border);font-size:.9rem;background:#fff
+    }
+    textarea{min-height:84px;resize:vertical}
+    button.primary{
+      border:0;border-radius:999px;padding:8px 14px;background:var(--accent);
+      cursor:pointer;box-shadow:var(--shadow);transition:transform .15s ease, box-shadow .15s ease;
+      color:var(--text);font-size:.9rem
+    }
+    button.primary:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(0,0,0,.12)}
+    button.ghost{
+      border-radius:999px;border:1px solid var(--border);background:#fafafa;
+      padding:7px 11px;font-size:.86rem;cursor:pointer;color:var(--muted)
+    }
+    button.ghost:hover{background:#f1f5f9}
+    hr{border:0;border-top:1px solid var(--border);margin:10px 0}
+    .list{display:flex;flex-direction:column;gap:8px}
+    .item{
+      display:flex;gap:10px;align-items:flex-start;
+      border:1px solid var(--border);background:#f9fafb;border-radius:12px;padding:10px;
+    }
+    .item.done{opacity:.65}
+    .item .grow{flex:1}
+    .badge{
+      font-size:.72rem;padding:2px 8px;border-radius:999px;background:var(--accent3);color:#0f766e;white-space:nowrap
+    }
+    .timer-display{font-size:1.8rem;font-weight:700;letter-spacing:.08em;text-align:center;margin:6px 0 10px}
+    .hidden{display:none !important}
+    .big{font-size:1.1rem}
+    .cast .card{padding:18px}
+    .cast .sub, .cast .ghost, .cast input, .cast textarea, .cast select{display:none !important}
+    .cast .timer-display{font-size:2.3rem}
+    .cast .item{padding:14px}
+    .cast .item input, .cast .item button{display:none !important}
+    .cast #schedAddWrap{display:none !important}
+    @media (max-width:640px){
+      .timer-display{font-size:1.5rem}
+    }
+  </style>
 </head>
 <body>
-  <header>
-    <div class="header-inner">
-      <div class="title">
-        <h1>LifeHub</h1>
-        <p>Two hubs. One site. Built for real life.</p>
-      </div>
-      <nav>
-        <a class="active" href="./index.html">🏡 Choose</a>
-        <a href="./classroom/index.html">🎒 Classroom</a>
-        <a href="./home/index.html">🏠 Home</a>
-      </nav>
+<header>
+  <div class="header-inner">
+    <div class="title">
+      <h1>LifeHub</h1>
+      <p>One page. Two hubs. Zero drama.</p>
     </div>
-  </header>
+    <nav>
+      <button id="tabClass" class="active" type="button">🎒 Classroom</button>
+      <button id="tabHome" type="button">🏠 Home</button>
+      <button id="castBtn" class="ghost" type="button">📺 Cast: <span id="castLabel">OFF</span></button>
+    </nav>
+  </div>
+</header>
 
-  <main>
+<main>
+  <!-- CLASSROOM -->
+  <section id="classroom">
     <div class="grid">
       <div class="card">
-        <h2>🎒 Classroom Hub <span class="pill">teacher tools</span></h2>
-        <p class="sub">Schedule + timer + sounds, designed to cast cleanly.</p>
-        <div class="tag-row">
-          <span class="tag">Live schedule</span><span class="tag">Timer</span><span class="tag">Cast mode</span>
+        <h2>Live schedule <span class="pill" id="schedModePill">teacher</span></h2>
+        <p class="sub">Edits save on this device. Cast mode hides editing + makes it TV-friendly.</p>
+
+        <div class="row" style="align-items:flex-end">
+          <div style="flex:1">
+            <div style="font-weight:800;font-size:1.15rem" id="liveClock">--:--</div>
+            <div class="sub" id="nowNextText" style="margin:2px 0 0">Now: — · Next: —</div>
+          </div>
+          <div class="row">
+            <button class="ghost" id="resetDay" type="button">Reset day</button>
+          </div>
         </div>
-        <div class="row" style="margin-top:12px">
-          <a class="primary" href="./classroom/index.html" style="display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:10px 14px;background:var(--accent);box-shadow:var(--shadow)">Open Classroom Hub</a>
+
+        <div id="scheduleList" class="list" style="margin-top:10px"></div>
+
+        <div id="schedAddWrap" style="margin-top:10px">
+          <div class="row">
+            <div style="flex:1"><label class="pill">Time</label><input id="addTime" type="time" /></div>
+            <div style="flex:2"><label class="pill">Label</label><input id="addLabel" type="text" placeholder="Morning Meeting" /></div>
+          </div>
+          <div class="row" style="margin-top:8px">
+            <button class="ghost" id="addItem" type="button">Add</button>
+          </div>
         </div>
       </div>
 
       <div class="card">
-        <h2>🏠 Home Hub <span class="pill">personal</span></h2>
-        <p class="sub">Routines, chores, grocery list, meal plan, and notes—saved on your device.</p>
-        <div class="tag-row">
-          <span class="tag">Routines</span><span class="tag">Chores</span><span class="tag">Grocery</span><span class="tag">Meal plan</span><span class="tag">Notes</span>
+        <h2>Quick timer</h2>
+        <p class="sub">Set minutes + seconds. Plays a small ding when done.</p>
+
+        <div class="row">
+          <div style="flex:1">
+            <label class="pill">Minutes</label>
+            <input type="number" id="min" min="0" max="180" value="5" />
+          </div>
+          <div style="flex:1">
+            <label class="pill">Seconds</label>
+            <input type="number" id="sec" min="0" max="59" value="0" />
+          </div>
         </div>
-        <div class="row" style="margin-top:12px">
-          <a class="primary" href="./home/index.html" style="display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:10px 14px;background:var(--accent);box-shadow:var(--shadow)">Open Home Hub</a>
+
+        <div class="timer-display" id="timerDisplay">05:00</div>
+
+        <div class="row">
+          <button class="primary" id="startBtn" type="button">Start</button>
+          <button class="ghost" id="pauseBtn" type="button">Pause</button>
+          <button class="ghost" id="resetBtn" type="button">Reset</button>
         </div>
       </div>
 
       <div class="card">
-        <h2>🛠 How it saves</h2>
-        <p class="sub">Everything here saves to <strong>this device</strong> (localStorage). If you want it to sync across devices later, we can add that.</p>
-        <div class="small-note">Tip: For casting, open the hub you want on the TV device and keep it full-screen.</div>
+        <h2>Notes (quick)</h2>
+        <p class="sub">Fast scratchpad for the day.</p>
+        <textarea id="cNotes" placeholder="Dismissal change... student absent... reminders..."></textarea>
+        <div class="row" style="margin-top:8px">
+          <button class="ghost" id="clearCNotes" type="button">Clear</button>
+          <span class="pill" id="cSaved">saved</span>
+        </div>
       </div>
     </div>
-  </main>
+  </section>
+
+  <!-- HOME -->
+  <section id="home" class="hidden">
+    <div class="grid">
+      <div class="card">
+        <h2>Routines <span class="pill">AM / PM</span></h2>
+        <p class="sub">Checklists reset daily (per device). Use for habits + anchors.</p>
+
+        <div class="row">
+          <button class="ghost" data-routine="morning" type="button">Morning</button>
+          <button class="ghost" data-routine="evening" type="button">Evening</button>
+          <span class="pill" id="routineLabel">morning</span>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <input id="routineAdd" type="text" placeholder="Add a routine step (e.g., meds, coffee, pack bag)" />
+          <button class="ghost" id="routineAddBtn" type="button">Add</button>
+        </div>
+
+        <div id="routineList" class="list" style="margin-top:10px"></div>
+
+        <div class="row" style="margin-top:8px">
+          <button class="ghost" id="routineReset" type="button">Reset today</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Chores <span class="pill">repeat</span></h2>
+        <p class="sub">Simple recurring chores with optional due labels.</p>
+
+        <div class="row">
+          <input id="choreText" type="text" placeholder="Chore (e.g., laundry, litter box, vacuum)" />
+          <select id="choreDue" style="max-width:160px">
+            <option value="">No due</option>
+            <option value="today">Today</option>
+            <option value="this week">This week</option>
+            <option value="weekend">Weekend</option>
+            <option value="monthly">Monthly</option>
+          </select>
+          <button class="ghost" id="choreAddBtn" type="button">Add</button>
+        </div>
+
+        <div id="choreList" class="list" style="margin-top:10px"></div>
+
+        <div class="row" style="margin-top:8px">
+          <button class="ghost" id="choreClearDone" type="button">Clear done</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Grocery list <span class="pill">tap to check</span></h2>
+        <p class="sub">Great on a phone. Keeps your list until you clear it.</p>
+
+        <div class="row">
+          <input id="grocText" type="text" placeholder="Add item (e.g., eggs, fruit, trash bags)" />
+          <button class="ghost" id="grocAddBtn" type="button">Add</button>
+        </div>
+
+        <div id="grocList" class="list" style="margin-top:10px"></div>
+
+        <div class="row" style="margin-top:8px">
+          <button class="ghost" id="grocClearChecked" type="button">Clear checked</button>
+          <button class="ghost" id="grocClearAll" type="button">Clear all</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Meal plan <span class="pill">weekly</span></h2>
+        <p class="sub">One line per day.</p>
+        <div class="list" id="mealList"></div>
+        <div class="row" style="margin-top:8px">
+          <button class="ghost" id="mealClear" type="button">Clear week</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Notes <span class="pill">brain dump</span></h2>
+        <p class="sub">Fast capture for random thoughts.</p>
+
+        <div class="row">
+          <input id="noteTitle" type="text" placeholder="Title (optional)" />
+        </div>
+        <div class="row" style="margin-top:8px">
+          <textarea id="noteBody" placeholder="Type your note..."></textarea>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <button class="primary" id="noteAddBtn" type="button">Add note</button>
+          <button class="ghost" id="noteClearDraft" type="button">Clear draft</button>
+        </div>
+
+        <div id="noteList" class="list" style="margin-top:10px"></div>
+      </div>
+
+      <div class="card">
+        <h2>Home timer <span class="pill">focus</span></h2>
+        <p class="sub">Cooking, cleaning, focus sprints.</p>
+
+        <div class="row">
+          <div style="flex:1">
+            <label class="pill">Minutes</label>
+            <input type="number" id="tMin" min="0" max="180" value="15" />
+          </div>
+          <div style="flex:1">
+            <label class="pill">Seconds</label>
+            <input type="number" id="tSec" min="0" max="59" value="0" />
+          </div>
+        </div>
+
+        <div class="timer-display" id="tDisp">15:00</div>
+
+        <div class="row">
+          <button class="primary" id="tStart" type="button">Start</button>
+          <button class="ghost" id="tPause" type="button">Pause</button>
+          <button class="ghost" id="tReset" type="button">Reset</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+  // tiny helpers
+  function qs(sel, root=document){ return root.querySelector(sel); }
+  function qsa(sel, root=document){ return [...root.querySelectorAll(sel)]; }
+  const store = {
+    get(key, fallback){
+      try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+      catch(e){ return fallback; }
+    },
+    set(key, val){
+      try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){}
+    }
+  };
+  function fmtTimer(sec){
+    const m = String(Math.floor(sec/60)).padStart(2,"0");
+    const s = String(sec%60).padStart(2,"0");
+    return `${m}:${s}`;
+  }
+  function uid(){ return Math.random().toString(16).slice(2) + Date.now().toString(16); }
+  function esc(s){ return String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;"); }
+
+  // tabs (no routing problems, ever)
+  const KEY_UI = { tab:"lifehub.ui.tab.v1", cast:"lifehub.ui.cast.v1" };
+  const tabClass = qs("#tabClass"), tabHome = qs("#tabHome");
+  const classroom = qs("#classroom"), home = qs("#home");
+  function setTab(which){
+    store.set(KEY_UI.tab, which);
+    const isClass = which === "classroom";
+    tabClass.classList.toggle("active", isClass);
+    tabHome.classList.toggle("active", !isClass);
+    classroom.classList.toggle("hidden", !isClass);
+    home.classList.toggle("hidden", isClass);
+  }
+  tabClass.addEventListener("click", ()=>setTab("classroom"));
+  tabHome.addEventListener("click", ()=>setTab("home"));
+
+  // cast mode (applies to whole page; meant for classroom TV use)
+  let castMode = !!store.get(KEY_UI.cast, false);
+  function applyCast(){
+    document.body.classList.toggle("cast", castMode);
+    qs("#castLabel").textContent = castMode ? "ON" : "OFF";
+    qs("#schedModePill").textContent = castMode ? "cast" : "teacher";
+  }
+  qs("#castBtn").addEventListener("click", ()=>{
+    castMode = !castMode;
+    store.set(KEY_UI.cast, castMode);
+    applyCast();
+  });
+
+  // ----------------------
+  // CLASSROOM: schedule
+  // ----------------------
+  const KEY_C = { schedule:"lifehub.classroom.schedule.v1", notes:"lifehub.classroom.notes.v1" };
+
+  const DEFAULT_SCHEDULE = [
+    { id: uid(), time:"08:00", label:"Morning Meeting" },
+    { id: uid(), time:"08:30", label:"Reading" },
+    { id: uid(), time:"09:15", label:"Centers" },
+    { id: uid(), time:"10:00", label:"Recess" },
+    { id: uid(), time:"10:25", label:"Math" },
+    { id: uid(), time:"11:15", label:"Lunch" },
+    { id: uid(), time:"11:55", label:"Writing" },
+    { id: uid(), time:"12:35", label:"Specials" },
+    { id: uid(), time:"13:20", label:"Science" },
+    { id: uid(), time:"14:00", label:"Pack up" },
+    { id: uid(), time:"14:20", label:"Dismissal" },
+  ];
+
+  let schedule = store.get(KEY_C.schedule, null);
+  if (!Array.isArray(schedule) || schedule.length === 0) schedule = JSON.parse(JSON.stringify(DEFAULT_SCHEDULE));
+
+  function parseTimeToMin(hhmm){
+    if (!hhmm || !hhmm.includes(":")) return null;
+    const [h,m] = hhmm.split(":").map(n=>Number(n));
+    if (Number.isNaN(h)||Number.isNaN(m)) return null;
+    return h*60+m;
+  }
+  function nowMinutes(){ const d=new Date(); return d.getHours()*60+d.getMinutes(); }
+  function sortSchedule(){
+    schedule.sort((a,b)=> (parseTimeToMin(a.time) ?? 99999) - (parseTimeToMin(b.time) ?? 99999));
+  }
+  function saveSchedule(){ store.set(KEY_C.schedule, schedule); }
+
+  const scheduleList = qs("#scheduleList");
+  const liveClock = qs("#liveClock");
+  const nowNextText = qs("#nowNextText");
+
+  function updateNowNext(){
+    const d = new Date();
+    liveClock.textContent = d.toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
+    const nowMin = nowMinutes();
+    sortSchedule();
+
+    let activeIndex = -1;
+    for (let i=0;i<schedule.length;i++){
+      const start = parseTimeToMin(schedule[i].time);
+      const end = (i<schedule.length-1) ? parseTimeToMin(schedule[i+1].time) : 24*60+1;
+      if (start !== null && nowMin >= start && nowMin < end){ activeIndex=i; break; }
+    }
+    const nowItem = activeIndex>=0 ? schedule[activeIndex] : null;
+    const nextItem = activeIndex>=0 ? schedule[activeIndex+1] : schedule[0];
+    nowNextText.textContent = `Now: ${nowItem ? nowItem.label : "—"} · Next: ${nextItem ? nextItem.label : "—"}`;
+  }
+
+  function renderSchedule(){
+    sortSchedule();
+    scheduleList.innerHTML = "";
+    const nowMin = nowMinutes();
+
+    let activeIndex = -1;
+    for (let i=0;i<schedule.length;i++){
+      const start = parseTimeToMin(schedule[i].time);
+      const end = (i<schedule.length-1) ? parseTimeToMin(schedule[i+1].time) : 24*60+1;
+      if (start !== null && nowMin >= start && nowMin < end){ activeIndex=i; break; }
+    }
+
+    schedule.forEach((it, idx)=>{
+      const row = document.createElement("div");
+      row.className = "item";
+      row.style.borderColor = idx===activeIndex ? "#c7d2ff" : "var(--border)";
+      row.style.background = idx===activeIndex ? "#eef2ff" : "#f9fafb";
+
+      if (castMode){
+        row.innerHTML = `
+          <div class="grow">
+            <div class="big" style="font-weight:800">${it.time} · ${esc(it.label)}</div>
+          </div>
+        `;
+      } else {
+        row.innerHTML = `
+          <div style="min-width:92px"><input type="time" value="${it.time}"></div>
+          <div class="grow"><input type="text" value="${esc(it.label)}"></div>
+          <div><button class="ghost" title="Delete">🗑</button></div>
+        `;
+        row.querySelector("input[type='time']").addEventListener("change",(e)=>{
+          it.time = e.target.value; saveSchedule(); renderSchedule();
+        });
+        row.querySelector("input[type='text']").addEventListener("input",(e)=>{
+          it.label = e.target.value; saveSchedule(); updateNowNext();
+        });
+        row.querySelector("button").addEventListener("click",()=>{
+          schedule = schedule.filter(s=>s.id!==it.id); saveSchedule(); renderSchedule();
+        });
+      }
+
+      scheduleList.appendChild(row);
+    });
+
+    updateNowNext();
+  }
+
+  qs("#resetDay").addEventListener("click", ()=>{
+    schedule = JSON.parse(JSON.stringify(DEFAULT_SCHEDULE));
+    saveSchedule();
+    renderSchedule();
+  });
+
+  qs("#addItem").addEventListener("click", ()=>{
+    const t = qs("#addTime").value;
+    const label = qs("#addLabel").value.trim();
+    if (!t || !label) return;
+    schedule.push({ id: uid(), time:t, label });
+    qs("#addLabel").value = "";
+    saveSchedule();
+    renderSchedule();
+  });
+
+  // CLASSROOM: timer
+  let timer = { interval:null, remaining:0 };
+  function setTimerDisplay(sec){ qs("#timerDisplay").textContent = fmtTimer(Math.max(0,sec)); }
+  function initTimerFromInputs(){
+    const m = Number(qs("#min").value||0);
+    const s = Number(qs("#sec").value||0);
+    setTimerDisplay(m*60+s);
+  }
+  initTimerFromInputs();
+  qs("#min").addEventListener("input", initTimerFromInputs);
+  qs("#sec").addEventListener("input", initTimerFromInputs);
+
+  function beep(){
+    try{
+      const AC = window.AudioContext || window.webkitAudioContext;
+      const ctx = new AC();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "sine"; o.frequency.value = 880;
+      g.gain.value = 0.18;
+      o.connect(g); g.connect(ctx.destination);
+      o.start();
+      setTimeout(()=>{ o.stop(); ctx.close(); }, 220);
+    }catch(e){}
+  }
+
+  qs("#startBtn").addEventListener("click", ()=>{
+    const m = Number(qs("#min").value||0);
+    const s = Number(qs("#sec").value||0);
+    const total = m*60+s;
+    if (!total) return;
+    clearInterval(timer.interval);
+    timer.remaining = total;
+    setTimerDisplay(timer.remaining);
+    timer.interval = setInterval(()=>{
+      timer.remaining--;
+      if (timer.remaining <= 0){
+        clearInterval(timer.interval);
+        qs("#timerDisplay").textContent = "Time!";
+        beep();
+        return;
+      }
+      setTimerDisplay(timer.remaining);
+    }, 1000);
+  });
+  qs("#pauseBtn").addEventListener("click", ()=> clearInterval(timer.interval));
+  qs("#resetBtn").addEventListener("click", ()=>{
+    clearInterval(timer.interval);
+    initTimerFromInputs();
+  });
+
+  // CLASSROOM: notes
+  const cNotes = qs("#cNotes");
+  cNotes.value = store.get(KEY_C.notes, "");
+  let cSavedT = null;
+  cNotes.addEventListener("input", ()=>{
+    clearTimeout(cSavedT);
+    qs("#cSaved").textContent = "saving...";
+    cSavedT = setTimeout(()=>{
+      store.set(KEY_C.notes, cNotes.value);
+      qs("#cSaved").textContent = "saved";
+    }, 250);
+  });
+  qs("#clearCNotes").addEventListener("click", ()=>{
+    cNotes.value = "";
+    store.set(KEY_C.notes, "");
+    qs("#cSaved").textContent = "saved";
+  });
+
+  // ----------------------
+  // HOME
+  // ----------------------
+  const KEY_H = {
+    routine:"lifehub.home.routines.v1",
+    routineDone:"lifehub.home.routines.done.v1",
+    chores:"lifehub.home.chores.v1",
+    groceries:"lifehub.home.groceries.v1",
+    meals:"lifehub.home.meals.v1",
+    notes:"lifehub.home.notes.v1",
+  };
+  const DAYS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+
+  function todayKey(){
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,"0");
+    const da = String(d.getDate()).padStart(2,"0");
+    return `${y}-${m}-${da}`;
+  }
+
+  const routineDefaults = {
+    morning: ["Water","Coffee/tea","Meds","Pack bag","Quick tidy (2 min)"],
+    evening: ["Dishes","Lay out clothes","Set alarms","Plan tomorrow (1 thing)"]
+  };
+
+  let routines = store.get(KEY_H.routine, routineDefaults);
+  if (!routines || typeof routines !== "object") routines = JSON.parse(JSON.stringify(routineDefaults));
+  if (!Array.isArray(routines.morning)) routines.morning = [...routineDefaults.morning];
+  if (!Array.isArray(routines.evening)) routines.evening = [...routineDefaults.evening];
+  store.set(KEY_H.routine, routines);
+
+  let routineDoneAll = store.get(KEY_H.routineDone, {});
+  if (!routineDoneAll || typeof routineDoneAll !== "object") routineDoneAll = {};
+  function ensureRoutineDoneToday(){
+    const k = todayKey();
+    if (!routineDoneAll[k]) routineDoneAll[k] = { morning:{}, evening:{} };
+    return { k, done: routineDoneAll[k] };
+  }
+
+  let routineMode = "morning";
+  const routineLabel = qs("#routineLabel");
+  const routineList = qs("#routineList");
+  function renderRoutine(){
+    routineLabel.textContent = routineMode;
+    routineList.innerHTML = "";
+    const { k, done } = ensureRoutineDoneToday();
+    const list = routines[routineMode] || [];
+    list.forEach((txt, idx)=>{
+      const id = `${routineMode}.${idx}`;
+      const checked = !!done[routineMode][id];
+      const row = document.createElement("div");
+      row.className = "item" + (checked ? " done" : "");
+      row.innerHTML = `
+        <input type="checkbox" ${checked?"checked":""} style="margin-top:3px" />
+        <div class="grow"><div style="font-weight:700">${esc(txt)}</div></div>
+        <button class="ghost" title="Remove">🗑</button>
+      `;
+      row.querySelector("input").addEventListener("change",(e)=>{
+        done[routineMode][id] = e.target.checked;
+        routineDoneAll[k] = done;
+        store.set(KEY_H.routineDone, routineDoneAll);
+        renderRoutine();
+      });
+      row.querySelector("button").addEventListener("click",()=>{
+        routines[routineMode].splice(idx,1);
+        store.set(KEY_H.routine, routines);
+        delete done[routineMode][id];
+        routineDoneAll[k] = done;
+        store.set(KEY_H.routineDone, routineDoneAll);
+        renderRoutine();
+      });
+      routineList.appendChild(row);
+    });
+  }
+  qsa("button[data-routine]").forEach(b=> b.addEventListener("click", ()=>{
+    routineMode = b.dataset.routine;
+    renderRoutine();
+  }));
+  qs("#routineAddBtn").addEventListener("click", ()=>{
+    const v = qs("#routineAdd").value.trim();
+    if (!v) return;
+    routines[routineMode].push(v);
+    store.set(KEY_H.routine, routines);
+    qs("#routineAdd").value = "";
+    renderRoutine();
+  });
+  qs("#routineReset").addEventListener("click", ()=>{
+    const { k, done } = ensureRoutineDoneToday();
+    done.morning = {}; done.evening = {};
+    routineDoneAll[k] = done;
+    store.set(KEY_H.routineDone, routineDoneAll);
+    renderRoutine();
+  });
+
+  // Chores
+  let chores = store.get(KEY_H.chores, []);
+  if (!Array.isArray(chores)) chores = [];
+  const choreList = qs("#choreList");
+  function renderChores(){
+    choreList.innerHTML = "";
+    chores.forEach((c, idx)=>{
+      const row = document.createElement("div");
+      row.className = "item" + (c.done ? " done" : "");
+      row.innerHTML = `
+        <input type="checkbox" ${c.done?"checked":""} style="margin-top:3px" />
+        <div class="grow">
+          <div style="font-weight:700">${esc(c.text)}</div>
+          ${c.due ? `<div class="sub" style="margin:4px 0 0"><span class="badge">${esc(c.due)}</span></div>` : ""}
+        </div>
+        <button class="ghost" title="Remove">🗑</button>
+      `;
+      row.querySelector("input").addEventListener("change",(e)=>{
+        c.done = e.target.checked; store.set(KEY_H.chores, chores); renderChores();
+      });
+      row.querySelector("button").addEventListener("click", ()=>{
+        chores.splice(idx,1); store.set(KEY_H.chores, chores); renderChores();
+      });
+      choreList.appendChild(row);
+    });
+  }
+  qs("#choreAddBtn").addEventListener("click", ()=>{
+    const text = qs("#choreText").value.trim();
+    const due = qs("#choreDue").value;
+    if (!text) return;
+    chores.unshift({ id: uid(), text, due, done:false });
+    qs("#choreText").value = ""; qs("#choreDue").value = "";
+    store.set(KEY_H.chores, chores); renderChores();
+  });
+  qs("#choreClearDone").addEventListener("click", ()=>{
+    chores = chores.filter(c=>!c.done);
+    store.set(KEY_H.chores, chores); renderChores();
+  });
+
+  // Groceries
+  let groceries = store.get(KEY_H.groceries, []);
+  if (!Array.isArray(groceries)) groceries = [];
+  const grocList = qs("#grocList");
+  function renderGroceries(){
+    grocList.innerHTML = "";
+    groceries.forEach((g, idx)=>{
+      const row = document.createElement("div");
+      row.className = "item" + (g.checked ? " done" : "");
+      row.innerHTML = `
+        <input type="checkbox" ${g.checked?"checked":""} style="margin-top:3px" />
+        <div class="grow"><div style="font-weight:700">${esc(g.text)}</div></div>
+        <button class="ghost" title="Remove">🗑</button>
+      `;
+      row.querySelector("input").addEventListener("change",(e)=>{
+        g.checked = e.target.checked; store.set(KEY_H.groceries, groceries); renderGroceries();
+      });
+      row.querySelector("button").addEventListener("click", ()=>{
+        groceries.splice(idx,1); store.set(KEY_H.groceries, groceries); renderGroceries();
+      });
+      grocList.appendChild(row);
+    });
+  }
+  qs("#grocAddBtn").addEventListener("click", ()=>{
+    const text = qs("#grocText").value.trim();
+    if (!text) return;
+    groceries.unshift({ id: uid(), text, checked:false });
+    qs("#grocText").value = "";
+    store.set(KEY_H.groceries, groceries); renderGroceries();
+  });
+  qs("#grocClearChecked").addEventListener("click", ()=>{
+    groceries = groceries.filter(g=>!g.checked);
+    store.set(KEY_H.groceries, groceries); renderGroceries();
+  });
+  qs("#grocClearAll").addEventListener("click", ()=>{
+    groceries = [];
+    store.set(KEY_H.groceries, groceries); renderGroceries();
+  });
+
+  // Meals
+  let meals = store.get(KEY_H.meals, {});
+  if (!meals || typeof meals !== "object") meals = {};
+  const mealList = qs("#mealList");
+  function renderMeals(){
+    mealList.innerHTML = "";
+    DAYS.forEach(day=>{
+      const row = document.createElement("div");
+      row.className = "item";
+      row.innerHTML = `
+        <div style="min-width:54px;font-weight:800">${day}</div>
+        <div class="grow"><input type="text" value="${esc(meals[day] || "")}" placeholder="Meal idea..." /></div>
+      `;
+      row.querySelector("input").addEventListener("input",(e)=>{
+        meals[day] = e.target.value; store.set(KEY_H.meals, meals);
+      });
+      mealList.appendChild(row);
+    });
+  }
+  qs("#mealClear").addEventListener("click", ()=>{
+    meals = {}; store.set(KEY_H.meals, meals); renderMeals();
+  });
+
+  // Home notes
+  let notes = store.get(KEY_H.notes, []);
+  if (!Array.isArray(notes)) notes = [];
+  const noteList = qs("#noteList");
+  function renderNotes(){
+    noteList.innerHTML = "";
+    notes.forEach((n, idx)=>{
+      const row = document.createElement("div");
+      row.className = "item";
+      row.innerHTML = `
+        <div class="grow">
+          ${n.title ? `<div style="font-weight:800">${esc(n.title)}</div>` : `<div style="font-weight:800">Note</div>`}
+          <div class="sub" style="white-space:pre-wrap;margin-top:6px">${esc(n.body)}</div>
+          <div class="sub" style="margin-top:6px">Saved: ${esc(n.when)}</div>
+        </div>
+        <button class="ghost" title="Delete">🗑</button>
+      `;
+      row.querySelector("button").addEventListener("click", ()=>{
+        notes.splice(idx,1); store.set(KEY_H.notes, notes); renderNotes();
+      });
+      noteList.appendChild(row);
+    });
+  }
+  qs("#noteAddBtn").addEventListener("click", ()=>{
+    const title = qs("#noteTitle").value.trim();
+    const body = qs("#noteBody").value.trim();
+    if (!body) return;
+    const when = new Date().toLocaleString([], {month:"short", day:"numeric", hour:"numeric", minute:"2-digit"});
+    notes.unshift({ id: uid(), title, body, when });
+    store.set(KEY_H.notes, notes);
+    qs("#noteTitle").value = ""; qs("#noteBody").value = "";
+    renderNotes();
+  });
+  qs("#noteClearDraft").addEventListener("click", ()=>{
+    qs("#noteTitle").value = ""; qs("#noteBody").value = "";
+  });
+
+  // Home timer
+  let t = { interval:null, remaining:0 };
+  function tInit(){
+    const m = Number(qs("#tMin").value||0);
+    const s = Number(qs("#tSec").value||0);
+    qs("#tDisp").textContent = fmtTimer(m*60+s);
+  }
+  tInit();
+  qs("#tMin").addEventListener("input", tInit);
+  qs("#tSec").addEventListener("input", tInit);
+
+  qs("#tStart").addEventListener("click", ()=>{
+    const m = Number(qs("#tMin").value||0);
+    const s = Number(qs("#tSec").value||0);
+    const total = m*60+s;
+    if (!total) return;
+    clearInterval(t.interval);
+    t.remaining = total;
+    qs("#tDisp").textContent = fmtTimer(t.remaining);
+    t.interval = setInterval(()=>{
+      t.remaining--;
+      if (t.remaining <= 0){
+        clearInterval(t.interval);
+        qs("#tDisp").textContent = "Time!";
+        beep();
+        return;
+      }
+      qs("#tDisp").textContent = fmtTimer(t.remaining);
+    }, 1000);
+  });
+  qs("#tPause").addEventListener("click", ()=> clearInterval(t.interval));
+  qs("#tReset").addEventListener("click", ()=>{
+    clearInterval(t.interval);
+    tInit();
+  });
+
+  // boot
+  applyCast();
+  setTab(store.get(KEY_UI.tab, "classroom"));
+  renderSchedule();
+  setInterval(updateNowNext, 1000);
+  setInterval(renderSchedule, 15000);
+
+  renderRoutine();
+  renderChores();
+  renderGroceries();
+  renderMeals();
+  renderNotes();
+</script>
 </body>
 </html>
