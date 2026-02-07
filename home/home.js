@@ -1,5 +1,4 @@
-
-/* Home hub: routines, chores, grocery, meal plan, notes, timer. Device-local. */
+/* Home hub: routines, chores, grocery, meal plan, notes, timer. Synced across devices via Netlify Blobs + local fallback. */
 
 const KEY = {
   routine: "lifehub.home.routines.v1",
@@ -14,7 +13,6 @@ const DAYS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 
 function todayKey(){
   const d = new Date();
-  // YYYY-MM-DD local
   const y = d.getFullYear();
   const m = String(d.getMonth()+1).padStart(2,"0");
   const da = String(d.getDate()).padStart(2,"0");
@@ -24,31 +22,44 @@ function todayKey(){
 function uid(){ return Math.random().toString(16).slice(2) + Date.now().toString(16); }
 function esc(s){ return String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;"); }
 
-/* Routines */
+/* State (loaded async) */
+let routines, routineDoneAll, chores, groceries, meals, notes;
+let routineMode = "morning";
+
 const routineDefaults = {
   morning: ["Water","Coffee/tea","Meds","Pack bag","Quick tidy (2 min)"],
   evening: ["Dishes","Lay out clothes","Set alarms","Plan tomorrow (1 thing)"]
 };
-let routines = store.get(KEY.routine, routineDefaults);
-if (!routines.morning) routines.morning = routineDefaults.morning;
-if (!routines.evening) routines.evening = routineDefaults.evening;
-store.set(KEY.routine, routines);
 
-let routineMode = "morning";
 const routineLabel = qs("#routineLabel");
 const routineList = qs("#routineList");
 const routineAdd = qs("#routineAdd");
+const choreList = qs("#choreList");
+const grocList = qs("#grocList");
+const mealList = qs("#mealList");
+const noteList = qs("#noteList");
 
-function getRoutineDone(){
-  const all = store.get(KEY.routineDone, {});
+function ensureRoutineShape(){
+  if (typeof routines !== "object" || routines === null) routines = JSON.parse(JSON.stringify(routineDefaults));
+  if (!Array.isArray(routines.morning)) routines.morning = [...routineDefaults.morning];
+  if (!Array.isArray(routines.evening)) routines.evening = [...routineDefaults.evening];
+
+  if (typeof routineDoneAll !== "object" || routineDoneAll === null) routineDoneAll = {};
   const k = todayKey();
-  if (!all[k]) all[k] = { morning:{}, evening:{} };
-  return { all, k, done: all[k] };
+  if (!routineDoneAll[k]) routineDoneAll[k] = { morning:{}, evening:{} };
 }
+
+function getRoutineDoneForToday(){
+  ensureRoutineShape();
+  const k = todayKey();
+  return { k, done: routineDoneAll[k] };
+}
+
+/* Routines */
 function renderRoutine(){
   routineLabel.textContent = routineMode;
   routineList.innerHTML = "";
-  const { all, k, done } = getRoutineDone();
+  const { k, done } = getRoutineDoneForToday();
   const list = routines[routineMode] || [];
   list.forEach((txt, idx)=>{
     const id = `${routineMode}.${idx}`;
@@ -64,46 +75,45 @@ function renderRoutine(){
     `;
     row.querySelector("input").addEventListener("change",(e)=>{
       done[routineMode][id] = e.target.checked;
-      all[k] = done;
-      store.set(KEY.routineDone, all);
+      routineDoneAll[k] = done;
+      syncStore.set(KEY.routineDone, routineDoneAll);
       renderRoutine();
     });
     row.querySelector("button").addEventListener("click",()=>{
       routines[routineMode].splice(idx,1);
-      store.set(KEY.routine, routines);
-      // also clear done state
+      syncStore.set(KEY.routine, routines);
       delete done[routineMode][id];
-      all[k] = done;
-      store.set(KEY.routineDone, all);
+      routineDoneAll[k] = done;
+      syncStore.set(KEY.routineDone, routineDoneAll);
       renderRoutine();
     });
     routineList.appendChild(row);
   });
 }
+
 qsa("button[data-routine]").forEach(b=> b.addEventListener("click", ()=>{
   routineMode = b.dataset.routine;
   renderRoutine();
 }));
+
 qs("#routineAddBtn").addEventListener("click", ()=>{
   const v = routineAdd.value.trim();
   if (!v) return;
   routines[routineMode].push(v);
-  store.set(KEY.routine, routines);
+  syncStore.set(KEY.routine, routines);
   routineAdd.value = "";
   renderRoutine();
 });
+
 qs("#routineReset").addEventListener("click", ()=>{
-  const { all, k, done } = getRoutineDone();
+  const { k, done } = getRoutineDoneForToday();
   done.morning = {}; done.evening = {};
-  all[k] = done;
-  store.set(KEY.routineDone, all);
+  routineDoneAll[k] = done;
+  syncStore.set(KEY.routineDone, routineDoneAll);
   renderRoutine();
 });
 
 /* Chores */
-let chores = store.get(KEY.chores, []);
-if (!Array.isArray(chores)) chores = [];
-const choreList = qs("#choreList");
 function renderChores(){
   choreList.innerHTML = "";
   chores.forEach((c, idx)=>{
@@ -119,17 +129,18 @@ function renderChores(){
     `;
     row.querySelector("input").addEventListener("change",(e)=>{
       c.done = e.target.checked;
-      store.set(KEY.chores, chores);
+      syncStore.set(KEY.chores, chores);
       renderChores();
     });
     row.querySelector("button").addEventListener("click", ()=>{
       chores.splice(idx,1);
-      store.set(KEY.chores, chores);
+      syncStore.set(KEY.chores, chores);
       renderChores();
     });
     choreList.appendChild(row);
   });
 }
+
 qs("#choreAddBtn").addEventListener("click", ()=>{
   const text = qs("#choreText").value.trim();
   const due = qs("#choreDue").value;
@@ -137,19 +148,17 @@ qs("#choreAddBtn").addEventListener("click", ()=>{
   chores.unshift({ id: uid(), text, due, done:false });
   qs("#choreText").value = "";
   qs("#choreDue").value = "";
-  store.set(KEY.chores, chores);
+  syncStore.set(KEY.chores, chores);
   renderChores();
 });
+
 qs("#choreClearDone").addEventListener("click", ()=>{
   chores = chores.filter(c=>!c.done);
-  store.set(KEY.chores, chores);
+  syncStore.set(KEY.chores, chores);
   renderChores();
 });
 
 /* Groceries */
-let groceries = store.get(KEY.groceries, []);
-if (!Array.isArray(groceries)) groceries = [];
-const grocList = qs("#grocList");
 function renderGroceries(){
   grocList.innerHTML = "";
   groceries.forEach((g, idx)=>{
@@ -162,40 +171,40 @@ function renderGroceries(){
     `;
     row.querySelector("input").addEventListener("change",(e)=>{
       g.checked = e.target.checked;
-      store.set(KEY.groceries, groceries);
+      syncStore.set(KEY.groceries, groceries);
       renderGroceries();
     });
     row.querySelector("button").addEventListener("click", ()=>{
       groceries.splice(idx,1);
-      store.set(KEY.groceries, groceries);
+      syncStore.set(KEY.groceries, groceries);
       renderGroceries();
     });
     grocList.appendChild(row);
   });
 }
+
 qs("#grocAddBtn").addEventListener("click", ()=>{
   const text = qs("#grocText").value.trim();
   if (!text) return;
   groceries.unshift({ id: uid(), text, checked:false });
   qs("#grocText").value = "";
-  store.set(KEY.groceries, groceries);
+  syncStore.set(KEY.groceries, groceries);
   renderGroceries();
 });
+
 qs("#grocClearChecked").addEventListener("click", ()=>{
   groceries = groceries.filter(g=>!g.checked);
-  store.set(KEY.groceries, groceries);
+  syncStore.set(KEY.groceries, groceries);
   renderGroceries();
 });
+
 qs("#grocClearAll").addEventListener("click", ()=>{
   groceries = [];
-  store.set(KEY.groceries, groceries);
+  syncStore.set(KEY.groceries, groceries);
   renderGroceries();
 });
 
 /* Meals */
-let meals = store.get(KEY.meals, {});
-if (typeof meals !== "object" || meals === null) meals = {};
-const mealList = qs("#mealList");
 function renderMeals(){
   mealList.innerHTML = "";
   DAYS.forEach(day=>{
@@ -207,21 +216,19 @@ function renderMeals(){
     `;
     row.querySelector("input").addEventListener("input",(e)=>{
       meals[day] = e.target.value;
-      store.set(KEY.meals, meals);
+      syncStore.set(KEY.meals, meals);
     });
     mealList.appendChild(row);
   });
 }
+
 qs("#mealClear").addEventListener("click", ()=>{
   meals = {};
-  store.set(KEY.meals, meals);
+  syncStore.set(KEY.meals, meals);
   renderMeals();
 });
 
 /* Notes */
-let notes = store.get(KEY.notes, []);
-if (!Array.isArray(notes)) notes = [];
-const noteList = qs("#noteList");
 function renderNotes(){
   noteList.innerHTML = "";
   notes.forEach((n, idx)=>{
@@ -237,29 +244,31 @@ function renderNotes(){
     `;
     row.querySelector("button").addEventListener("click", ()=>{
       notes.splice(idx,1);
-      store.set(KEY.notes, notes);
+      syncStore.set(KEY.notes, notes);
       renderNotes();
     });
     noteList.appendChild(row);
   });
 }
+
 qs("#noteAddBtn").addEventListener("click", ()=>{
   const title = qs("#noteTitle").value.trim();
   const body = qs("#noteBody").value.trim();
   if (!body) return;
   const when = new Date().toLocaleString([], {month:"short", day:"numeric", hour:"numeric", minute:"2-digit"});
   notes.unshift({ id: uid(), title, body, when });
-  store.set(KEY.notes, notes);
+  syncStore.set(KEY.notes, notes);
   qs("#noteTitle").value = "";
   qs("#noteBody").value = "";
   renderNotes();
 });
+
 qs("#noteClearDraft").addEventListener("click", ()=>{
   qs("#noteTitle").value = "";
   qs("#noteBody").value = "";
 });
 
-/* Timer (no audio yet; we can add later) */
+/* Timer (local) */
 let t = { interval:null, remaining:0 };
 function tInit(){
   const m = Number(qs("#tMin").value||0);
@@ -283,7 +292,6 @@ qs("#tStart").addEventListener("click", ()=>{
     if (t.remaining <= 0){
       clearInterval(t.interval);
       qs("#tDisp").textContent = "Time!";
-      // lightweight beep
       try{
         const AC = window.AudioContext || window.webkitAudioContext;
         const ctx = new AC();
@@ -306,9 +314,33 @@ qs("#tReset").addEventListener("click", ()=>{
   tInit();
 });
 
-/* boot */
-renderRoutine();
-renderChores();
-renderGroceries();
-renderMeals();
-renderNotes();
+/* Boot */
+(async function init(){
+  routines = await syncStore.get(KEY.routine, routineDefaults);
+  routineDoneAll = await syncStore.get(KEY.routineDone, {});
+  chores = await syncStore.get(KEY.chores, []);
+  groceries = await syncStore.get(KEY.groceries, []);
+  meals = await syncStore.get(KEY.meals, {});
+  notes = await syncStore.get(KEY.notes, []);
+
+  if (!Array.isArray(chores)) chores = [];
+  if (!Array.isArray(groceries)) groceries = [];
+  if (typeof meals !== "object" || meals === null) meals = {};
+  if (!Array.isArray(notes)) notes = [];
+
+  ensureRoutineShape();
+
+  // seed cloud with something valid if empty
+  syncStore.set(KEY.routine, routines, { debounceMs: 50 });
+  syncStore.set(KEY.routineDone, routineDoneAll, { debounceMs: 50 });
+  syncStore.set(KEY.chores, chores, { debounceMs: 50 });
+  syncStore.set(KEY.groceries, groceries, { debounceMs: 50 });
+  syncStore.set(KEY.meals, meals, { debounceMs: 50 });
+  syncStore.set(KEY.notes, notes, { debounceMs: 50 });
+
+  renderRoutine();
+  renderChores();
+  renderGroceries();
+  renderMeals();
+  renderNotes();
+})();

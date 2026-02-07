@@ -25,8 +25,14 @@ const DEFAULT_SCHEDULE = [
 
 let castMode = !!store.get(KEY.cast, false);
 
-let schedule = store.get(KEY.schedule, null);
-if (!Array.isArray(schedule) || schedule.length === 0) schedule = JSON.parse(JSON.stringify(DEFAULT_SCHEDULE));
+let schedule = null;
+// schedule is synced across devices
+(async ()=>{
+  schedule = await syncStore.get(KEY.schedule, null);
+  if (!Array.isArray(schedule) || schedule.length === 0) schedule = JSON.parse(JSON.stringify(DEFAULT_SCHEDULE));
+  syncStore.set(KEY.schedule, schedule, { debounceMs: 50 });
+  renderSchedule();
+})();
 
 const scheduleList = qs("#scheduleList");
 const liveClock = qs("#liveClock");
@@ -45,7 +51,7 @@ function nowMinutes(){
 function sortSchedule(){
   schedule.sort((a,b)=> (parseTimeToMin(a.time) ?? 99999) - (parseTimeToMin(b.time) ?? 99999));
 }
-function saveSchedule(){ store.set(KEY.schedule, schedule); }
+function saveSchedule(){ syncStore.set(KEY.schedule, schedule, { debounceMs: 200 }); }
 
 function renderSchedule(){
   sortSchedule();
@@ -186,19 +192,23 @@ qs("#resetBtn").addEventListener("click", ()=>{
 
 /* Notes */
 const notesEl = qs("#notes");
-notesEl.value = store.get(KEY.notes, "");
+notesEl.value = "";
+(async ()=>{
+  const v = await syncStore.get(KEY.notes, "");
+  notesEl.value = v || "";
+})();
 let savedT = null;
 notesEl.addEventListener("input", ()=>{
   clearTimeout(savedT);
   qs("#savedLabel").textContent = "saving...";
   savedT = setTimeout(()=>{
-    store.set(KEY.notes, notesEl.value);
+    syncStore.set(KEY.notes, notesEl.value);
     qs("#savedLabel").textContent = "saved";
   }, 250);
 });
 qs("#clearNotes").addEventListener("click", ()=>{
   notesEl.value = "";
-  store.set(KEY.notes, "");
+  syncStore.set(KEY.notes, "");
   qs("#savedLabel").textContent = "saved";
 });
 
@@ -287,6 +297,6 @@ window.addEventListener("pointerdown", ()=>{ audio.ensure(); if(audio.ctx?.state
 
 /* Tick */
 applyCastMode();
-renderSchedule();
+if (schedule) renderSchedule();
 setInterval(updateNowNext, 1000);
-setInterval(renderSchedule, 15000);
+setInterval(()=>{ if (schedule) renderSchedule(); }, 15000);

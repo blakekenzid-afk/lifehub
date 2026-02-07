@@ -1,0 +1,9 @@
+{
+  "name": "lifehub",
+  "private": true,
+  "version": "1.0.0",
+  "description": "LifeHub static site with Netlify Functions + Blobs sync",
+  "dependencies": {
+    "@netlify/blobs": "^9.0.0"
+  }
+}
