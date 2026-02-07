@@ -2,3 +2,15 @@
   publish = "."
   command = ""
   functions = "netlify/functions"
+
+[[redirects]]
+  from = "/classroom"
+  to = "/classroom/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/home"
+  to = "/home/"
+  status = 301
+  force = true
