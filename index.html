@@ -20,7 +20,6 @@
     }
     *{box-sizing:border-box;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
     body{margin:0;background:var(--bg);color:var(--text)}
-    a{color:inherit;text-decoration:none}
     header{
       background:linear-gradient(135deg,#c7d2ff,#ffe0f0);
       padding:14px 16px;
@@ -49,8 +48,6 @@
     .sub{margin:0 0 10px;font-size:.82rem;color:var(--muted)}
     .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
     .pill{display:inline-flex;gap:6px;align-items:center;padding:2px 8px;border-radius:999px;background:var(--soft);font-size:.72rem;color:var(--muted)}
-    .tag-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-    .tag{font-size:.75rem;padding:2px 8px;border-radius:999px;background:#f3f4ff;color:#4b5563}
     input,select,textarea{
       width:100%;padding:8px 9px;border-radius:10px;border:1px solid var(--border);font-size:.9rem;background:#fff
     }
@@ -66,7 +63,6 @@
       padding:7px 11px;font-size:.86rem;cursor:pointer;color:var(--muted)
     }
     button.ghost:hover{background:#f1f5f9}
-    hr{border:0;border-top:1px solid var(--border);margin:10px 0}
     .list{display:flex;flex-direction:column;gap:8px}
     .item{
       display:flex;gap:10px;align-items:flex-start;
@@ -79,16 +75,7 @@
     }
     .timer-display{font-size:1.8rem;font-weight:700;letter-spacing:.08em;text-align:center;margin:6px 0 10px}
     .hidden{display:none !important}
-    .big{font-size:1.1rem}
-    .cast .card{padding:18px}
-    .cast .sub, .cast .ghost, .cast input, .cast textarea, .cast select{display:none !important}
-    .cast .timer-display{font-size:2.3rem}
-    .cast .item{padding:14px}
-    .cast .item input, .cast .item button{display:none !important}
-    .cast #schedAddWrap{display:none !important}
-    @media (max-width:640px){
-      .timer-display{font-size:1.5rem}
-    }
+    @media (max-width:640px){ .timer-display{font-size:1.5rem} }
   </style>
 </head>
 <body>
@@ -110,8 +97,8 @@
   <section id="classroom">
     <div class="grid">
       <div class="card">
-        <h2>Live schedule <span class="pill" id="schedModePill">teacher</span></h2>
-        <p class="sub">Edits save on this device. Cast mode hides editing + makes it TV-friendly.</p>
+        <h2>Live schedule <span class="pill">teacher</span></h2>
+        <p class="sub">Edits save on this device.</p>
 
         <div class="row" style="align-items:flex-end">
           <div style="flex:1">
@@ -125,10 +112,16 @@
 
         <div id="scheduleList" class="list" style="margin-top:10px"></div>
 
-        <div id="schedAddWrap" style="margin-top:10px">
+        <div style="margin-top:10px">
           <div class="row">
-            <div style="flex:1"><label class="pill">Time</label><input id="addTime" type="time" /></div>
-            <div style="flex:2"><label class="pill">Label</label><input id="addLabel" type="text" placeholder="Morning Meeting" /></div>
+            <div style="flex:1">
+              <label class="pill">Time</label>
+              <input id="addTime" type="time" />
+            </div>
+            <div style="flex:2">
+              <label class="pill">Label</label>
+              <input id="addLabel" type="text" placeholder="Morning Meeting" />
+            </div>
           </div>
           <div class="row" style="margin-top:8px">
             <button class="ghost" id="addItem" type="button">Add</button>
@@ -177,7 +170,7 @@
     <div class="grid">
       <div class="card">
         <h2>Routines <span class="pill">AM / PM</span></h2>
-        <p class="sub">Checklists reset daily (per device). Use for habits + anchors.</p>
+        <p class="sub">Checklists reset daily (per device).</p>
 
         <div class="row">
           <button class="ghost" data-routine="morning" type="button">Morning</button>
@@ -186,7 +179,7 @@
         </div>
 
         <div class="row" style="margin-top:10px">
-          <input id="routineAdd" type="text" placeholder="Add a routine step (e.g., meds, coffee, pack bag)" />
+          <input id="routineAdd" type="text" placeholder="Add a routine step" />
           <button class="ghost" id="routineAddBtn" type="button">Add</button>
         </div>
 
@@ -198,11 +191,11 @@
       </div>
 
       <div class="card">
-        <h2>Chores <span class="pill">repeat</span></h2>
+        <h2>Chores</h2>
         <p class="sub">Simple recurring chores with optional due labels.</p>
 
         <div class="row">
-          <input id="choreText" type="text" placeholder="Chore (e.g., laundry, litter box, vacuum)" />
+          <input id="choreText" type="text" placeholder="Chore (e.g., laundry)" />
           <select id="choreDue" style="max-width:160px">
             <option value="">No due</option>
             <option value="today">Today</option>
@@ -221,11 +214,11 @@
       </div>
 
       <div class="card">
-        <h2>Grocery list <span class="pill">tap to check</span></h2>
-        <p class="sub">Great on a phone. Keeps your list until you clear it.</p>
+        <h2>Grocery list</h2>
+        <p class="sub">Tap to check. Clears when you say so.</p>
 
         <div class="row">
-          <input id="grocText" type="text" placeholder="Add item (e.g., eggs, fruit, trash bags)" />
+          <input id="grocText" type="text" placeholder="Add item (e.g., eggs)" />
           <button class="ghost" id="grocAddBtn" type="button">Add</button>
         </div>
 
@@ -238,7 +231,7 @@
       </div>
 
       <div class="card">
-        <h2>Meal plan <span class="pill">weekly</span></h2>
+        <h2>Meal plan</h2>
         <p class="sub">One line per day.</p>
         <div class="list" id="mealList"></div>
         <div class="row" style="margin-top:8px">
@@ -247,8 +240,8 @@
       </div>
 
       <div class="card">
-        <h2>Notes <span class="pill">brain dump</span></h2>
-        <p class="sub">Fast capture for random thoughts.</p>
+        <h2>Notes</h2>
+        <p class="sub">Brain dump. Fast capture.</p>
 
         <div class="row">
           <input id="noteTitle" type="text" placeholder="Title (optional)" />
@@ -265,7 +258,7 @@
       </div>
 
       <div class="card">
-        <h2>Home timer <span class="pill">focus</span></h2>
+        <h2>Home timer</h2>
         <p class="sub">Cooking, cleaning, focus sprints.</p>
 
         <div class="row">
@@ -292,7 +285,6 @@
 </main>
 
 <script>
-  // tiny helpers
   function qs(sel, root=document){ return root.querySelector(sel); }
   function qsa(sel, root=document){ return [...root.querySelectorAll(sel)]; }
   const store = {
@@ -312,10 +304,11 @@
   function uid(){ return Math.random().toString(16).slice(2) + Date.now().toString(16); }
   function esc(s){ return String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;"); }
 
-  // tabs (no routing problems, ever)
-  const KEY_UI = { tab:"lifehub.ui.tab.v1", cast:"lifehub.ui.cast.v1" };
+  // Tabs (and force re-render on switch so nothing feels "stale")
+  const KEY_UI = { tab:"lifehub.ui.tab.v2" };
   const tabClass = qs("#tabClass"), tabHome = qs("#tabHome");
   const classroom = qs("#classroom"), home = qs("#home");
+
   function setTab(which){
     store.set(KEY_UI.tab, which);
     const isClass = which === "classroom";
@@ -323,13 +316,24 @@
     tabHome.classList.toggle("active", !isClass);
     classroom.classList.toggle("hidden", !isClass);
     home.classList.toggle("hidden", isClass);
+
+    // Force fresh render on every tab switch
+    if (isClass){
+      renderSchedule();
+      updateNowNext();
+    } else {
+      renderRoutine();
+      renderChores();
+      renderGroceries();
+      renderMeals();
+      renderNotes();
+    }
   }
   tabClass.addEventListener("click", ()=>setTab("classroom"));
   tabHome.addEventListener("click", ()=>setTab("home"));
-  // ----------------------
-  // CLASSROOM: schedule
-  // ----------------------
-  const KEY_C = { schedule:"lifehub.classroom.schedule.v1", notes:"lifehub.classroom.notes.v1" };
+
+  // ----- CLASSROOM -----
+  const KEY_C = { schedule:"lifehub.classroom.schedule.v2", notes:"lifehub.classroom.notes.v2" };
 
   const DEFAULT_SCHEDULE = [
     { id: uid(), time:"08:00", label:"Morning Meeting" },
@@ -399,28 +403,21 @@
       row.style.borderColor = idx===activeIndex ? "#c7d2ff" : "var(--border)";
       row.style.background = idx===activeIndex ? "#eef2ff" : "#f9fafb";
 
-      if (castMode){
-        row.innerHTML = `
-          <div class="grow">
-            <div class="big" style="font-weight:800">${it.time} · ${esc(it.label)}</div>
-          </div>
-        `;
-      } else {
-        row.innerHTML = `
-          <div style="min-width:92px"><input type="time" value="${it.time}"></div>
-          <div class="grow"><input type="text" value="${esc(it.label)}"></div>
-          <div><button class="ghost" title="Delete">🗑</button></div>
-        `;
-        row.querySelector("input[type='time']").addEventListener("change",(e)=>{
-          it.time = e.target.value; saveSchedule(); renderSchedule();
-        });
-        row.querySelector("input[type='text']").addEventListener("input",(e)=>{
-          it.label = e.target.value; saveSchedule(); updateNowNext();
-        });
-        row.querySelector("button").addEventListener("click",()=>{
-          schedule = schedule.filter(s=>s.id!==it.id); saveSchedule(); renderSchedule();
-        });
-      }
+      row.innerHTML = `
+        <div style="min-width:92px"><input type="time" value="${it.time}"></div>
+        <div class="grow"><input type="text" value="${esc(it.label)}"></div>
+        <div><button class="ghost" title="Delete" type="button">🗑</button></div>
+      `;
+
+      row.querySelector("input[type='time']").addEventListener("change",(e)=>{
+        it.time = e.target.value; saveSchedule(); renderSchedule();
+      });
+      row.querySelector("input[type='text']").addEventListener("input",(e)=>{
+        it.label = e.target.value; saveSchedule(); updateNowNext();
+      });
+      row.querySelector("button").addEventListener("click",()=>{
+        schedule = schedule.filter(s=>s.id!==it.id); saveSchedule(); renderSchedule();
+      });
 
       scheduleList.appendChild(row);
     });
@@ -434,30 +431,28 @@
     renderSchedule();
   });
 
- qs("#addItem").addEventListener("click", ()=>{
-  let t = qs("#addTime").value;
-  const label = qs("#addLabel").value.trim();
+  // FIX: Always add (auto-fill time if blank)
+  qs("#addItem").addEventListener("click", ()=>{
+    let t = qs("#addTime").value;
+    const label = qs("#addLabel").value.trim();
+    if (!label) return;
 
-  // If time wasn't chosen, default to the current time (rounded to nearest 5 min)
-  if (!t){
-    const d = new Date();
-    let m = d.getMinutes();
-    m = Math.round(m / 5) * 5;
-    if (m === 60){ d.setHours(d.getHours()+1); m = 0; }
-    t = String(d.getHours()).padStart(2,"0") + ":" + String(m).padStart(2,"0");
-  }
+    if (!t){
+      const d = new Date();
+      let m = d.getMinutes();
+      m = Math.round(m / 5) * 5;
+      if (m === 60){ d.setHours(d.getHours()+1); m = 0; }
+      t = String(d.getHours()).padStart(2,"0") + ":" + String(m).padStart(2,"0");
+    }
 
-  if (!label) return;
+    schedule.push({ id: uid(), time: t, label });
+    qs("#addLabel").value = "";
+    qs("#addTime").value = t;
+    saveSchedule();
+    renderSchedule();
+  });
 
-  schedule.push({ id: uid(), time: t, label });
-  qs("#addLabel").value = "";
-  qs("#addTime").value = t; // keeps the time filled for quick adds
-  saveSchedule();
-  renderSchedule();
-});
-
-
-  // CLASSROOM: timer
+  // Classroom timer
   let timer = { interval:null, remaining:0 };
   function setTimerDisplay(sec){ qs("#timerDisplay").textContent = fmtTimer(Math.max(0,sec)); }
   function initTimerFromInputs(){
@@ -508,7 +503,7 @@
     initTimerFromInputs();
   });
 
-  // CLASSROOM: notes
+  // Classroom notes
   const cNotes = qs("#cNotes");
   cNotes.value = store.get(KEY_C.notes, "");
   let cSavedT = null;
@@ -526,16 +521,14 @@
     qs("#cSaved").textContent = "saved";
   });
 
-  // ----------------------
-  // HOME
-  // ----------------------
+  // ----- HOME -----
   const KEY_H = {
-    routine:"lifehub.home.routines.v1",
-    routineDone:"lifehub.home.routines.done.v1",
-    chores:"lifehub.home.chores.v1",
-    groceries:"lifehub.home.groceries.v1",
-    meals:"lifehub.home.meals.v1",
-    notes:"lifehub.home.notes.v1",
+    routine:"lifehub.home.routines.v2",
+    routineDone:"lifehub.home.routines.done.v2",
+    chores:"lifehub.home.chores.v2",
+    groceries:"lifehub.home.groceries.v2",
+    meals:"lifehub.home.meals.v2",
+    notes:"lifehub.home.notes.v2",
   };
   const DAYS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 
@@ -582,7 +575,7 @@
       row.innerHTML = `
         <input type="checkbox" ${checked?"checked":""} style="margin-top:3px" />
         <div class="grow"><div style="font-weight:700">${esc(txt)}</div></div>
-        <button class="ghost" title="Remove">🗑</button>
+        <button class="ghost" type="button" title="Remove">🗑</button>
       `;
       row.querySelector("input").addEventListener("change",(e)=>{
         done[routineMode][id] = e.target.checked;
@@ -601,10 +594,12 @@
       routineList.appendChild(row);
     });
   }
+
   qsa("button[data-routine]").forEach(b=> b.addEventListener("click", ()=>{
     routineMode = b.dataset.routine;
     renderRoutine();
   }));
+
   qs("#routineAddBtn").addEventListener("click", ()=>{
     const v = qs("#routineAdd").value.trim();
     if (!v) return;
@@ -613,6 +608,7 @@
     qs("#routineAdd").value = "";
     renderRoutine();
   });
+
   qs("#routineReset").addEventListener("click", ()=>{
     const { k, done } = ensureRoutineDoneToday();
     done.morning = {}; done.evening = {};
@@ -636,7 +632,7 @@
           <div style="font-weight:700">${esc(c.text)}</div>
           ${c.due ? `<div class="sub" style="margin:4px 0 0"><span class="badge">${esc(c.due)}</span></div>` : ""}
         </div>
-        <button class="ghost" title="Remove">🗑</button>
+        <button class="ghost" type="button" title="Remove">🗑</button>
       `;
       row.querySelector("input").addEventListener("change",(e)=>{
         c.done = e.target.checked; store.set(KEY_H.chores, chores); renderChores();
@@ -660,7 +656,7 @@
     store.set(KEY_H.chores, chores); renderChores();
   });
 
-  // Groceries
+  // Groceries (force immediate render)
   let groceries = store.get(KEY_H.groceries, []);
   if (!Array.isArray(groceries)) groceries = [];
   const grocList = qs("#grocList");
@@ -672,7 +668,7 @@
       row.innerHTML = `
         <input type="checkbox" ${g.checked?"checked":""} style="margin-top:3px" />
         <div class="grow"><div style="font-weight:700">${esc(g.text)}</div></div>
-        <button class="ghost" title="Remove">🗑</button>
+        <button class="ghost" type="button" title="Remove">🗑</button>
       `;
       row.querySelector("input").addEventListener("change",(e)=>{
         g.checked = e.target.checked; store.set(KEY_H.groceries, groceries); renderGroceries();
@@ -684,19 +680,14 @@
     });
   }
   qs("#grocAddBtn").addEventListener("click", ()=>{
-  const text = qs("#grocText").value.trim();
-  if (!text) return;
-
-  groceries.unshift({ id: uid(), text, checked:false });
-  store.set(KEY_H.groceries, groceries);
-
-  qs("#grocText").value = "";
-
-  // Force immediate UI update (helps on some browsers)
-  renderGroceries();
-  requestAnimationFrame(renderGroceries);
-});
-
+    const text = qs("#grocText").value.trim();
+    if (!text) return;
+    groceries.unshift({ id: uid(), text, checked:false });
+    store.set(KEY_H.groceries, groceries);
+    qs("#grocText").value = "";
+    renderGroceries();
+    requestAnimationFrame(renderGroceries);
+  });
   qs("#grocClearChecked").addEventListener("click", ()=>{
     groceries = groceries.filter(g=>!g.checked);
     store.set(KEY_H.groceries, groceries); renderGroceries();
@@ -729,7 +720,7 @@
     meals = {}; store.set(KEY_H.meals, meals); renderMeals();
   });
 
-  // Home notes
+  // Notes
   let notes = store.get(KEY_H.notes, []);
   if (!Array.isArray(notes)) notes = [];
   const noteList = qs("#noteList");
@@ -744,7 +735,7 @@
           <div class="sub" style="white-space:pre-wrap;margin-top:6px">${esc(n.body)}</div>
           <div class="sub" style="margin-top:6px">Saved: ${esc(n.when)}</div>
         </div>
-        <button class="ghost" title="Delete">🗑</button>
+        <button class="ghost" type="button" title="Delete">🗑</button>
       `;
       row.querySelector("button").addEventListener("click", ()=>{
         notes.splice(idx,1); store.set(KEY_H.notes, notes); renderNotes();
@@ -776,7 +767,6 @@
   tInit();
   qs("#tMin").addEventListener("input", tInit);
   qs("#tSec").addEventListener("input", tInit);
-
   qs("#tStart").addEventListener("click", ()=>{
     const m = Number(qs("#tMin").value||0);
     const s = Number(qs("#tSec").value||0);
@@ -803,7 +793,6 @@
   });
 
   // boot
-  setTab(store.get(KEY_UI.tab, "classroom"));
   renderSchedule();
   setInterval(updateNowNext, 1000);
   setInterval(renderSchedule, 15000);
@@ -813,6 +802,8 @@
   renderGroceries();
   renderMeals();
   renderNotes();
+
+  setTab(store.get(KEY_UI.tab, "classroom"));
 </script>
 </body>
 </html>
