@@ -101,7 +101,6 @@
     <nav>
       <button id="tabClass" class="active" type="button">🎒 Classroom</button>
       <button id="tabHome" type="button">🏠 Home</button>
-      <button id="castBtn" class="ghost" type="button">📺 Cast: <span id="castLabel">OFF</span></button>
     </nav>
   </div>
 </header>
@@ -327,20 +326,6 @@
   }
   tabClass.addEventListener("click", ()=>setTab("classroom"));
   tabHome.addEventListener("click", ()=>setTab("home"));
-
-  // cast mode (applies to whole page; meant for classroom TV use)
-  let castMode = !!store.get(KEY_UI.cast, false);
-  function applyCast(){
-    document.body.classList.toggle("cast", castMode);
-    qs("#castLabel").textContent = castMode ? "ON" : "OFF";
-    qs("#schedModePill").textContent = castMode ? "cast" : "teacher";
-  }
-  qs("#castBtn").addEventListener("click", ()=>{
-    castMode = !castMode;
-    store.set(KEY_UI.cast, castMode);
-    applyCast();
-  });
-
   // ----------------------
   // CLASSROOM: schedule
   // ----------------------
@@ -798,7 +783,6 @@
   });
 
   // boot
-  applyCast();
   setTab(store.get(KEY_UI.tab, "classroom"));
   renderSchedule();
   setInterval(updateNowNext, 1000);
