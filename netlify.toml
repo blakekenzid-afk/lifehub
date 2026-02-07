@@ -2,25 +2,3 @@
   publish = "."
   command = ""
   functions = "netlify/functions"
-
-# Serve the classroom page whether or not there's a trailing slash
-[[redirects]]
-  from = "/classroom"
-  to = "/classroom/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/classroom/"
-  to = "/classroom/index.html"
-  status = 200
-
-# Serve the home page whether or not there's a trailing slash
-[[redirects]]
-  from = "/home"
-  to = "/home/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/home/"
-  to = "/home/index.html"
-  status = 200
