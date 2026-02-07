@@ -434,15 +434,28 @@
     renderSchedule();
   });
 
-  qs("#addItem").addEventListener("click", ()=>{
-    const t = qs("#addTime").value;
-    const label = qs("#addLabel").value.trim();
-    if (!t || !label) return;
-    schedule.push({ id: uid(), time:t, label });
-    qs("#addLabel").value = "";
-    saveSchedule();
-    renderSchedule();
-  });
+ qs("#addItem").addEventListener("click", ()=>{
+  let t = qs("#addTime").value;
+  const label = qs("#addLabel").value.trim();
+
+  // If time wasn't chosen, default to the current time (rounded to nearest 5 min)
+  if (!t){
+    const d = new Date();
+    let m = d.getMinutes();
+    m = Math.round(m / 5) * 5;
+    if (m === 60){ d.setHours(d.getHours()+1); m = 0; }
+    t = String(d.getHours()).padStart(2,"0") + ":" + String(m).padStart(2,"0");
+  }
+
+  if (!label) return;
+
+  schedule.push({ id: uid(), time: t, label });
+  qs("#addLabel").value = "";
+  qs("#addTime").value = t; // keeps the time filled for quick adds
+  saveSchedule();
+  renderSchedule();
+});
+
 
   // CLASSROOM: timer
   let timer = { interval:null, remaining:0 };
