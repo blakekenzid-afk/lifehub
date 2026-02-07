@@ -684,12 +684,19 @@
     });
   }
   qs("#grocAddBtn").addEventListener("click", ()=>{
-    const text = qs("#grocText").value.trim();
-    if (!text) return;
-    groceries.unshift({ id: uid(), text, checked:false });
-    qs("#grocText").value = "";
-    store.set(KEY_H.groceries, groceries); renderGroceries();
-  });
+  const text = qs("#grocText").value.trim();
+  if (!text) return;
+
+  groceries.unshift({ id: uid(), text, checked:false });
+  store.set(KEY_H.groceries, groceries);
+
+  qs("#grocText").value = "";
+
+  // Force immediate UI update (helps on some browsers)
+  renderGroceries();
+  requestAnimationFrame(renderGroceries);
+});
+
   qs("#grocClearChecked").addEventListener("click", ()=>{
     groceries = groceries.filter(g=>!g.checked);
     store.set(KEY_H.groceries, groceries); renderGroceries();
