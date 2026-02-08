@@ -1,0 +1,1107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LifeHub</title>
+
+  <!-- Optional cozy fonts (safe if blocked; falls back to system fonts) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Nunito:wght@600;700;800&family=Quicksand:wght@600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#f7f5fb;
+      --card:#ffffff;
+      --text:#1f2933;
+      --muted:#6b7280;
+      --accent:#b9c6ff;
+      --accent2:#ffd6e8;
+      --accent3:#c9f2e7;
+      --soft:#eef2ff;
+      --border:#e5e7eb;
+      --shadow:0 8px 18px rgba(0,0,0,.06);
+      --radius:14px;
+
+      /* Fonts controlled by the Customize panel */
+      --fontBody: Inter;
+      --fontHead: "Baloo 2";
+    }
+
+    *{box-sizing:border-box;font-family:var(--fontBody),system-ui,-apple-system,"Segoe UI",sans-serif}
+    body{margin:0;background:var(--bg);color:var(--text)}
+    header{
+      background:linear-gradient(135deg,#c7d2ff,#ffe0f0);
+      padding:14px 16px;
+      box-shadow:var(--shadow);
+      position:sticky;top:0;z-index:50;
+    }
+    .header-inner{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+    .title h1{margin:0;font-size:1.1rem;letter-spacing:.02em;font-family:var(--fontHead),var(--fontBody),system-ui,sans-serif}
+    .title p{margin:2px 0 0;font-size:.85rem;color:var(--muted)}
+    nav{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    nav button{
+      border:0;border-radius:999px;padding:8px 12px;
+      background:rgba(255,255,255,.75);cursor:pointer;
+      font-size:.85rem;transition:transform .15s ease, box-shadow .15s ease;
+      display:flex;align-items:center;gap:6px;color:var(--text)
+    }
+    nav button.active{background:var(--card);box-shadow:var(--shadow)}
+    nav button:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
+    main{max-width:1100px;margin:16px auto 40px;padding:0 14px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+    .card{
+      background:var(--card);border-radius:var(--radius);padding:14px;
+      box-shadow:var(--shadow);border:1px solid rgba(0,0,0,.03);
+      position:relative;
+    }
+    .card:before{
+      content:"";
+      position:absolute;left:0;top:0;bottom:0;width:8px;border-radius:14px 0 0 14px;
+      background:linear-gradient(180deg,var(--accent2),var(--accent));
+      opacity:.55;
+    }
+    .card > *{position:relative}
+    .card h2{
+      margin:0 0 8px;font-size:1rem;display:flex;align-items:center;gap:8px;
+      font-family:var(--fontHead),var(--fontBody),system-ui,sans-serif;
+      letter-spacing:.01em;
+    }
+    .hicon{
+      width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;
+      border-radius:9px;background:rgba(255,255,255,.65);
+      border:1px solid rgba(0,0,0,.06);
+      box-shadow:0 6px 12px rgba(0,0,0,.06);
+      flex:0 0 22px;
+    }
+    .hicon svg{width:16px;height:16px;display:block}
+    .sub{margin:0 0 10px;font-size:.82rem;color:var(--muted)}
+    .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .pill{display:inline-flex;gap:6px;align-items:center;padding:2px 8px;border-radius:999px;background:var(--soft);font-size:.72rem;color:var(--muted)}
+    input,select,textarea{
+      width:100%;padding:8px 9px;border-radius:10px;border:1px solid var(--border);font-size:.9rem;background:#fff
+    }
+    textarea{min-height:84px;resize:vertical}
+    button.primary{
+      border:0;border-radius:999px;padding:8px 14px;background:var(--accent);
+      cursor:pointer;box-shadow:var(--shadow);transition:transform .15s ease, box-shadow .15s ease;
+      color:var(--text);font-size:.9rem
+    }
+    button.primary:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(0,0,0,.12)}
+    button.ghost{
+      border-radius:999px;border:1px solid var(--border);background:#fafafa;
+      padding:7px 11px;font-size:.86rem;cursor:pointer;color:var(--muted)
+    }
+    button.ghost:hover{background:#f1f5f9}
+    .list{display:flex;flex-direction:column;gap:8px}
+    .item{
+      display:flex;gap:10px;align-items:flex-start;
+      border:1px solid var(--border);background:#f9fafb;border-radius:12px;padding:10px;
+    }
+    .item.done{opacity:.65}
+    .item .grow{flex:1}
+    .badge{
+      font-size:.72rem;padding:2px 8px;border-radius:999px;background:var(--accent3);color:#0f766e;white-space:nowrap
+    }
+    .timer-display{font-size:1.8rem;font-weight:700;letter-spacing:.08em;text-align:center;margin:6px 0 10px}
+    .hidden{display:none !important}
+    @media (max-width:640px){ .timer-display{font-size:1.5rem} }
+
+    /* ---------- Customize modal ---------- */
+    .modal-backdrop{
+      position:fixed;inset:0;background:rgba(15,23,42,.45);
+      display:none;align-items:flex-end;justify-content:center;
+      padding:16px;z-index:200;
+    }
+    .modal-backdrop.open{display:flex}
+    .modal{
+      width:min(720px, 100%);
+      background:rgba(255,255,255,.92);
+      backdrop-filter: blur(10px);
+      border:1px solid rgba(255,255,255,.35);
+      border-radius:18px;
+      box-shadow:0 18px 40px rgba(0,0,0,.22);
+      overflow:hidden;
+    }
+    .modal-header{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      padding:14px 14px;
+      background:linear-gradient(135deg,var(--accent2),var(--accent3));
+      border-bottom:1px solid rgba(0,0,0,.06);
+    }
+    .modal-header h3{
+      margin:0;font-size:1.05rem;font-family:var(--fontHead),var(--fontBody),system-ui,sans-serif;
+    }
+    .modal-body{padding:14px}
+    .two-col{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .swatch-row{display:flex;gap:8px;flex-wrap:wrap}
+    .swatch{
+      width:34px;height:34px;border-radius:12px;border:1px solid rgba(0,0,0,.10);
+      box-shadow:0 6px 14px rgba(0,0,0,.10);cursor:pointer;
+      outline:none;
+    }
+    .swatch[aria-checked="true"]{box-shadow:0 0 0 4px rgba(185,198,255,.75), 0 8px 18px rgba(0,0,0,.18)}
+    .small{font-size:.78rem;color:var(--muted);margin:6px 0 0}
+    .modal-footer{
+      display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;
+      padding:12px 14px;border-top:1px solid rgba(0,0,0,.06);
+      background:rgba(255,255,255,.75);
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="title">
+      <h1>LifeHub</h1>
+      <p>One page. Two hubs. Zero drama.</p>
+    </div>
+    <nav>
+      <button id="tabClass" class="active" type="button">🎒 Classroom</button>
+      <button id="tabHome" type="button">🏠 Home</button>
+      <button id="openCustomize" type="button">✨ Customize</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- CLASSROOM -->
+  <section id="classroom">
+    <div class="grid">
+      <div class="card">
+        <h2><span class="hicon" data-ico="schedule"></span>Live schedule <span class="pill">teacher</span></h2>
+        <p class="sub">Edits save on this device.</p>
+
+        <div class="row" style="align-items:flex-end">
+          <div style="flex:1">
+            <div style="font-weight:800;font-size:1.15rem" id="liveClock">--:--</div>
+            <div class="sub" id="nowNextText" style="margin:2px 0 0">Now: — · Next: —</div>
+          </div>
+          <div class="row">
+            <button class="ghost" id="resetDay" type="button">Reset day</button>
+          </div>
+        </div>
+
+        <div id="scheduleList" class="list" style="margin-top:10px"></div>
+
+        <div style="margin-top:10px">
+          <div class="row">
+            <div style="flex:1">
+              <label class="pill">Time</label>
+              <input id="addTime" type="time" />
+            </div>
+            <div style="flex:2">
+              <label class="pill">Label</label>
+              <input id="addLabel" type="text" placeholder="Morning Meeting" />
+            </div>
+          </div>
+          <div class="row" style="margin-top:8px">
+            <button class="ghost" id="addItem" type="button">Add</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><span class="hicon" data-ico="timer"></span>Quick timer</h2>
+        <p class="sub">Set minutes + seconds. Plays a small ding when done.</p>
+
+        <div class="row">
+          <div style="flex:1">
+            <label class="pill">Minutes</label>
+            <input type="number" id="min" min="0" max="180" value="5" />
+          </div>
+          <div style="flex:1">
+            <label class="pill">Seconds</label>
+            <input type="number" id="sec" min="0" max="59" value="0" />
+          </div>
+        </div>
+
+        <div class="timer-display" id="timerDisplay">05:00</div>
+
+        <div class="row">
+          <button class="primary" id="startBtn" type="button">Start</button>
+          <button class="ghost" id="pauseBtn" type="button">Pause</button>
+          <button class="ghost" id="resetBtn" type="button">Reset</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><span class="hicon" data-ico="notes"></span>Notes (quick)</h2>
+        <p class="sub">Fast scratchpad for the day.</p>
+        <textarea id="cNotes" placeholder="Dismissal change... student absent... reminders..."></textarea>
+        <div class="row" style="margin-top:8px">
+          <button class="ghost" id="clearCNotes" type="button">Clear</button>
+          <span class="pill" id="cSaved">saved</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOME -->
+  <section id="home" class="hidden">
+    <div class="grid">
+      <div class="card">
+        <h2><span class="hicon" data-ico="routine"></span>Routines <span class="pill">AM / PM</span></h2>
+        <p class="sub">Checklists reset daily (per device).</p>
+
+        <div class="row">
+          <button class="ghost" data-routine="morning" type="button">Morning</button>
+          <button class="ghost" data-routine="evening" type="button">Evening</button>
+          <span class="pill" id="routineLabel">morning</span>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <input id="routineAdd" type="text" placeholder="Add a routine step" />
+          <button class="ghost" id="routineAddBtn" type="button">Add</button>
+        </div>
+
+        <div id="routineList" class="list" style="margin-top:10px"></div>
+
+        <div class="row" style="margin-top:8px">
+          <button class="ghost" id="routineReset" type="button">Reset today</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><span class="hicon" data-ico="chores"></span>Chores</h2>
+        <p class="sub">Simple recurring chores with optional due labels.</p>
+
+        <div class="row">
+          <input id="choreText" type="text" placeholder="Chore (e.g., laundry)" />
+          <select id="choreDue" style="max-width:160px">
+            <option value="">No due</option>
+            <option value="today">Today</option>
+            <option value="this week">This week</option>
+            <option value="weekend">Weekend</option>
+            <option value="monthly">Monthly</option>
+          </select>
+          <button class="ghost" id="choreAddBtn" type="button">Add</button>
+        </div>
+
+        <div id="choreList" class="list" style="margin-top:10px"></div>
+
+        <div class="row" style="margin-top:8px">
+          <button class="ghost" id="choreClearDone" type="button">Clear done</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><span class="hicon" data-ico="grocery"></span>Grocery list</h2>
+        <p class="sub">Tap to check. Clears when you say so.</p>
+
+        <div class="row">
+          <input id="grocText" type="text" placeholder="Add item (e.g., eggs)" />
+          <button class="ghost" id="grocAddBtn" type="button">Add</button>
+        </div>
+
+        <div id="grocList" class="list" style="margin-top:10px"></div>
+
+        <div class="row" style="margin-top:8px">
+          <button class="ghost" id="grocClearChecked" type="button">Clear checked</button>
+          <button class="ghost" id="grocClearAll" type="button">Clear all</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><span class="hicon" data-ico="meal"></span>Meal plan</h2>
+        <p class="sub">One line per day.</p>
+        <div class="list" id="mealList"></div>
+        <div class="row" style="margin-top:8px">
+          <button class="ghost" id="mealClear" type="button">Clear week</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><span class="hicon" data-ico="notes"></span>Notes</h2>
+        <p class="sub">Brain dump. Fast capture.</p>
+
+        <div class="row">
+          <input id="noteTitle" type="text" placeholder="Title (optional)" />
+        </div>
+        <div class="row" style="margin-top:8px">
+          <textarea id="noteBody" placeholder="Type your note..."></textarea>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <button class="primary" id="noteAddBtn" type="button">Add note</button>
+          <button class="ghost" id="noteClearDraft" type="button">Clear draft</button>
+        </div>
+
+        <div id="noteList" class="list" style="margin-top:10px"></div>
+      </div>
+
+      <div class="card">
+        <h2><span class="hicon" data-ico="timer"></span>Home timer</h2>
+        <p class="sub">Cooking, cleaning, focus sprints.</p>
+
+        <div class="row">
+          <div style="flex:1">
+            <label class="pill">Minutes</label>
+            <input type="number" id="tMin" min="0" max="180" value="15" />
+          </div>
+          <div style="flex:1">
+            <label class="pill">Seconds</label>
+            <input type="number" id="tSec" min="0" max="59" value="0" />
+          </div>
+        </div>
+
+        <div class="timer-display" id="tDisp">15:00</div>
+
+        <div class="row">
+          <button class="primary" id="tStart" type="button">Start</button>
+          <button class="ghost" id="tPause" type="button">Pause</button>
+          <button class="ghost" id="tReset" type="button">Reset</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Customize modal -->
+<div class="modal-backdrop" id="customizeBackdrop" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal" role="document">
+    <div class="modal-header">
+      <h3>✨ Customize LifeHub</h3>
+      <button class="ghost" id="closeCustomize" type="button">Close</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="two-col">
+        <div class="card" style="box-shadow:none;border:1px solid rgba(0,0,0,.06)">
+          <h2>Palette</h2>
+          <p class="sub">Pick a cozy pastel set. Saves on this device.</p>
+          <div class="swatch-row" id="paletteSwatches" aria-label="palette choices"></div>
+          <p class="small">Tip: You can always go back to “Default.”</p>
+        </div>
+
+        <div class="card" style="box-shadow:none;border:1px solid rgba(0,0,0,.06)">
+          <h2>Look</h2>
+          <p class="sub">Fonts + icons + card accents.</p>
+
+          <label class="pill" style="margin-bottom:6px">Header font</label>
+          <select id="fontHeadSel">
+            <option value="Baloo 2">Baloo 2 (bubble)</option>
+            <option value="Nunito">Nunito (rounded)</option>
+            <option value="Quicksand">Quicksand (soft)</option>
+            <option value="Inter">Inter (clean)</option>
+          </select>
+
+          <div style="height:10px"></div>
+          <label class="pill" style="margin-bottom:6px">Body font</label>
+          <select id="fontBodySel">
+            <option value="Inter">Inter (clean)</option>
+            <option value="Nunito">Nunito (rounded)</option>
+            <option value="Quicksand">Quicksand (soft)</option>
+          </select>
+
+          <div style="height:10px"></div>
+          <label class="pill" style="margin-bottom:6px">Icon style</label>
+          <select id="iconStyleSel">
+            <option value="illustrated">Illustrated (playful)</option>
+            <option value="minimal">Minimal (calm)</option>
+          </select>
+
+          <div style="height:10px"></div>
+          <label class="pill" style="margin-bottom:6px">Card accent bar</label>
+          <select id="accentStyleSel">
+            <option value="on">On</option>
+            <option value="off">Off</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="ghost" id="resetTheme" type="button">Reset to default</button>
+      <button class="primary" id="saveTheme" type="button">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function qs(sel, root=document){ return root.querySelector(sel); }
+  function qsa(sel, root=document){ return [...root.querySelectorAll(sel)]; }
+  const store = {
+    get(key, fallback){
+      try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+      catch(e){ return fallback; }
+    },
+    set(key, val){
+      try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){}
+    }
+  };
+  function fmtTimer(sec){
+    const m = String(Math.floor(sec/60)).padStart(2,"0");
+    const s = String(sec%60).padStart(2,"0");
+    return `${m}:${s}`;
+  }
+  function uid(){ return Math.random().toString(16).slice(2) + Date.now().toString(16); }
+  function esc(s){ return String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;"); }
+
+  // ---------------- ICONS ----------------
+  const ICON_SETS = {
+    illustrated: {
+      schedule: (stroke)=>`<svg viewBox="0 0 24 24" fill="none" stroke="${stroke}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="3"/><path d="M7 2.8v3.2M17 2.8v3.2"/><path d="M3.5 9h17"/></svg>`,
+      timer: (stroke)=>`<svg viewBox="0 0 24 24" fill="none" stroke="${stroke}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6"/><path d="M12 14V9"/><circle cx="12" cy="14" r="7"/><path d="M19 6l2 2"/></svg>`,
+      notes: (stroke)=>`<svg viewBox="0 0 24 24" fill="none" stroke="${stroke}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12l4 4v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M14 4v4h4"/><path d="M6 13h12M6 17h10"/></svg>`,
+      routine: (stroke)=>`<svg viewBox="0 0 24 24" fill="none" stroke="${stroke}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v4h4"/><path d="M12 7v6l4 2"/></svg>`,
+      chores: (stroke)=>`<svg viewBox="0 0 24 24" fill="none" stroke="${stroke}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4"/><path d="M6 20V9"/><path d="M6 9l10-5 2 4-10 5"/><path d="M8 14h8"/></svg>`,
+      grocery: (stroke)=>`<svg viewBox="0 0 24 24" fill="none" stroke="${stroke}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h15l-2 9H8L6 7z"/><path d="M6 7l-2-3H2"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg>`,
+      meal: (stroke)=>`<svg viewBox="0 0 24 24" fill="none" stroke="${stroke}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h16v4H4z"/><path d="M7 7v14M17 7v14"/><path d="M7 12h10"/></svg>`
+    },
+    minimal: {
+      schedule: (stroke)=>`<svg viewBox="0 0 24 24" fill="none" stroke="${stroke}" stroke-width="2"><rect x="5" y="6" width="14" height="14"/><path d="M5 10h14"/></svg>`,
+      timer: (stroke)=>`<svg viewBox="0 0 24 24" fill="none" stroke="${stroke}" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 13V9"/></svg>`,
+      notes: (stroke)=>`<svg viewBox="0 0 24 24" fill="none" stroke="${stroke}" stroke-width="2"><rect x="5" y="4" width="14" height="16"/><path d="M8 9h8M8 13h8"/></svg>`,
+      routine: (stroke)=>`<svg viewBox="0 0 24 24" fill="none" stroke="${stroke}" stroke-width="2"><path d="M4 12a8 8 0 1 0 2-5"/><path d="M4 4v4h4"/></svg>`,
+      chores: (stroke)=>`<svg viewBox="0 0 24 24" fill="none" stroke="${stroke}" stroke-width="2"><path d="M7 20V6"/><path d="M7 6l10-3 1 3-10 3"/></svg>`,
+      grocery: (stroke)=>`<svg viewBox="0 0 24 24" fill="none" stroke="${stroke}" stroke-width="2"><path d="M6 7h14l-2 10H8L6 7z"/><circle cx="9" cy="20" r="1"/><circle cx="17" cy="20" r="1"/></svg>`,
+      meal: (stroke)=>`<svg viewBox="0 0 24 24" fill="none" stroke="${stroke}" stroke-width="2"><path d="M6 4h12v16H6z"/><path d="M6 10h12"/></svg>`
+    }
+  };
+
+  function currentIconStroke(){
+    // Use accent for illustrated; muted for minimal.
+    const mode = getTheme().iconStyle;
+    return mode === "minimal" ? getComputedStyle(document.documentElement).getPropertyValue("--muted").trim() || "#6b7280"
+                              : getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#b9c6ff";
+  }
+
+  function applyIcons(mode){
+    const set = ICON_SETS[mode] || ICON_SETS.illustrated;
+    const stroke = currentIconStroke();
+    qsa("[data-ico]").forEach(el=>{
+      const key = el.getAttribute("data-ico");
+      el.innerHTML = (set[key] ? set[key](stroke) : "");
+    });
+  }
+
+  // ---------------- THEME (Customize panel) ----------------
+  const THEME_KEY = "lifehub.ui.theme.v2"; // bump version
+  const DEFAULT_THEME = {
+    paletteId: "default",
+    fontHead: "Baloo 2",
+    fontBody: "Inter",
+    accentBar: "on",
+    iconStyle: "illustrated"
+  };
+
+  const PALETTES = [
+    { id:"default", name:"Default", vars:{ bg:"#f7f5fb", card:"#ffffff", text:"#1f2933", muted:"#6b7280", accent:"#b9c6ff", accent2:"#ffd6e8", accent3:"#c9f2e7", soft:"#eef2ff", border:"#e5e7eb" } },
+    { id:"pinkTea", name:"Pink Tea", vars:{ bg:"#fff5fb", card:"#ffffff", text:"#3a2433", muted:"#7a5a6e", accent:"#ffc6dd", accent2:"#ffe0f0", accent3:"#c9f2e7", soft:"#fff0f7", border:"#f0d6e3" } },
+    { id:"lavenderSky", name:"Lavender Sky", vars:{ bg:"#f6f4ff", card:"#ffffff", text:"#2f2a46", muted:"#6a6790", accent:"#c7d2ff", accent2:"#e7ddff", accent3:"#d6f5ef", soft:"#eef2ff", border:"#e5e7ff" } },
+    { id:"mintBerry", name:"Mint Berry", vars:{ bg:"#f2fffb", card:"#ffffff", text:"#1f2f2b", muted:"#557a70", accent:"#b9f5e7", accent2:"#ffd6e8", accent3:"#d6f5ef", soft:"#e9fff7", border:"#cfeee4" } },
+    { id:"sunset", name:"Soft Sunset", vars:{ bg:"#fff8f0", card:"#ffffff", text:"#3a2b1f", muted:"#7a6b5a", accent:"#ffd9b8", accent2:"#ffe0f0", accent3:"#c7d2ff", soft:"#fff1e6", border:"#f0e0d3" } },
+  ];
+
+  function applyTheme(t){
+    const palette = PALETTES.find(p=>p.id===t.paletteId) || PALETTES[0];
+    const vars = palette.vars;
+
+    const root = document.documentElement.style;
+    Object.entries(vars).forEach(([k,v])=> root.setProperty(`--${k}`, v));
+    root.setProperty("--fontHead", t.fontHead || DEFAULT_THEME.fontHead);
+    root.setProperty("--fontBody", t.fontBody || DEFAULT_THEME.fontBody);
+
+    // Accent bar toggle
+    const on = (t.accentBar || "on") === "on";
+    const styleElId = "accentBarToggleStyle";
+    let styleEl = document.getElementById(styleElId);
+    if (!styleEl){
+      styleEl = document.createElement("style");
+      styleEl.id = styleElId;
+      document.head.appendChild(styleEl);
+    }
+    styleEl.textContent = on ? `.card:before{opacity:.55}` : `.card:before{opacity:0}`;
+
+    // Icons after theme (so stroke can reflect accent/muted)
+    applyIcons(t.iconStyle || "illustrated");
+  }
+
+  function getTheme(){
+    const saved = store.get(THEME_KEY, null);
+    return saved && typeof saved === "object" ? { ...DEFAULT_THEME, ...saved } : { ...DEFAULT_THEME };
+  }
+
+  function setTheme(t){
+    store.set(THEME_KEY, t);
+    applyTheme(t);
+  }
+
+  // Modal wiring
+  const backdrop = qs("#customizeBackdrop");
+  const openBtn = qs("#openCustomize");
+  const closeBtn = qs("#closeCustomize");
+  const saveBtn = qs("#saveTheme");
+  const resetBtn = qs("#resetTheme");
+  const paletteWrap = qs("#paletteSwatches");
+  const fontHeadSel = qs("#fontHeadSel");
+  const fontBodySel = qs("#fontBodySel");
+  const iconStyleSel = qs("#iconStyleSel");
+  const accentStyleSel = qs("#accentStyleSel");
+
+  let draftTheme = getTheme();
+
+  function openModal(){
+    draftTheme = getTheme();
+    syncModalFromTheme(draftTheme);
+    backdrop.classList.add("open");
+    backdrop.setAttribute("aria-hidden","false");
+  }
+  function closeModal(){
+    backdrop.classList.remove("open");
+    backdrop.setAttribute("aria-hidden","true");
+  }
+  openBtn.addEventListener("click", openModal);
+  closeBtn.addEventListener("click", closeModal);
+  backdrop.addEventListener("click", (e)=>{ if (e.target === backdrop) closeModal(); });
+  document.addEventListener("keydown", (e)=>{ if (e.key === "Escape" && backdrop.classList.contains("open")) closeModal(); });
+
+  function makeSwatch(p){
+    const b = document.createElement("button");
+    b.className = "swatch";
+    b.type = "button";
+    b.title = p.name;
+    b.style.background = `linear-gradient(135deg, ${p.vars.accent2}, ${p.vars.accent}, ${p.vars.accent3})`;
+    b.setAttribute("role","radio");
+    b.setAttribute("aria-checked","false");
+    b.addEventListener("click", ()=>{
+      draftTheme.paletteId = p.id;
+      syncModalFromTheme(draftTheme);
+    });
+    return b;
+  }
+  function renderPaletteSwatches(){
+    paletteWrap.innerHTML = "";
+    PALETTES.forEach(p=> paletteWrap.appendChild(makeSwatch(p)));
+  }
+  function syncModalFromTheme(t){
+    qsa(".swatch", paletteWrap).forEach((sw, idx)=>{
+      const p = PALETTES[idx];
+      sw.setAttribute("aria-checked", p.id === t.paletteId ? "true" : "false");
+    });
+    fontHeadSel.value = t.fontHead;
+    fontBodySel.value = t.fontBody;
+    iconStyleSel.value = t.iconStyle;
+    accentStyleSel.value = t.accentBar;
+  }
+  renderPaletteSwatches();
+
+  fontHeadSel.addEventListener("change", ()=>{ draftTheme.fontHead = fontHeadSel.value; });
+  fontBodySel.addEventListener("change", ()=>{ draftTheme.fontBody = fontBodySel.value; });
+  iconStyleSel.addEventListener("change", ()=>{ draftTheme.iconStyle = iconStyleSel.value; });
+  accentStyleSel.addEventListener("change", ()=>{ draftTheme.accentBar = accentStyleSel.value; });
+
+  saveBtn.addEventListener("click", ()=>{
+    setTheme(draftTheme);
+    closeModal();
+  });
+  resetBtn.addEventListener("click", ()=>{
+    setTheme({ ...DEFAULT_THEME });
+    closeModal();
+  });
+
+  // Apply saved theme immediately on load
+  applyTheme(getTheme());
+
+  // Tabs (and force re-render on switch so nothing feels "stale")
+  const KEY_UI = { tab:"lifehub.ui.tab.v2" };
+  const tabClass = qs("#tabClass"), tabHome = qs("#tabHome");
+  const classroom = qs("#classroom"), home = qs("#home");
+
+  function setTab(which){
+    store.set(KEY_UI.tab, which);
+    const isClass = which === "classroom";
+    tabClass.classList.toggle("active", isClass);
+    tabHome.classList.toggle("active", !isClass);
+    classroom.classList.toggle("hidden", !isClass);
+    home.classList.toggle("hidden", isClass);
+
+    // Force fresh render on every tab switch
+    if (isClass){
+      renderSchedule();
+      updateNowNext();
+    } else {
+      renderRoutine();
+      renderChores();
+      renderGroceries();
+      renderMeals();
+      renderNotes();
+    }
+  }
+  tabClass.addEventListener("click", ()=>setTab("classroom"));
+  tabHome.addEventListener("click", ()=>setTab("home"));
+
+  // ----- CLASSROOM -----
+  const KEY_C = { schedule:"lifehub.classroom.schedule.v2", notes:"lifehub.classroom.notes.v2" };
+
+  const DEFAULT_SCHEDULE = [
+    { id: uid(), time:"08:00", label:"Morning Meeting" },
+    { id: uid(), time:"08:30", label:"Reading" },
+    { id: uid(), time:"09:15", label:"Centers" },
+    { id: uid(), time:"10:00", label:"Recess" },
+    { id: uid(), time:"10:25", label:"Math" },
+    { id: uid(), time:"11:15", label:"Lunch" },
+    { id: uid(), time:"11:55", label:"Writing" },
+    { id: uid(), time:"12:35", label:"Specials" },
+    { id: uid(), time:"13:20", label:"Science" },
+    { id: uid(), time:"14:00", label:"Pack up" },
+    { id: uid(), time:"14:20", label:"Dismissal" },
+  ];
+
+  let schedule = store.get(KEY_C.schedule, null);
+  if (!Array.isArray(schedule) || schedule.length === 0) schedule = JSON.parse(JSON.stringify(DEFAULT_SCHEDULE));
+
+  function parseTimeToMin(hhmm){
+    if (!hhmm || !hhmm.includes(":")) return null;
+    const [h,m] = hhmm.split(":").map(n=>Number(n));
+    if (Number.isNaN(h)||Number.isNaN(m)) return null;
+    return h*60+m;
+  }
+  function nowMinutes(){ const d=new Date(); return d.getHours()*60+d.getMinutes(); }
+  function sortSchedule(){
+    schedule.sort((a,b)=> (parseTimeToMin(a.time) ?? 99999) - (parseTimeToMin(b.time) ?? 99999));
+  }
+  function saveSchedule(){ store.set(KEY_C.schedule, schedule); }
+
+  const scheduleList = qs("#scheduleList");
+  const liveClock = qs("#liveClock");
+  const nowNextText = qs("#nowNextText");
+
+  function updateNowNext(){
+    const d = new Date();
+    liveClock.textContent = d.toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
+    const nowMin = nowMinutes();
+    sortSchedule();
+
+    let activeIndex = -1;
+    for (let i=0;i<schedule.length;i++){
+      const start = parseTimeToMin(schedule[i].time);
+      const end = (i<schedule.length-1) ? parseTimeToMin(schedule[i+1].time) : 24*60+1;
+      if (start !== null && nowMin >= start && nowMin < end){ activeIndex=i; break; }
+    }
+    const nowItem = activeIndex>=0 ? schedule[activeIndex] : null;
+    const nextItem = activeIndex>=0 ? schedule[activeIndex+1] : schedule[0];
+    nowNextText.textContent = `Now: ${nowItem ? nowItem.label : "—"} · Next: ${nextItem ? nextItem.label : "—"}`;
+  }
+
+  function renderSchedule(){
+    sortSchedule();
+    scheduleList.innerHTML = "";
+    const nowMin = nowMinutes();
+
+    let activeIndex = -1;
+    for (let i=0;i<schedule.length;i++){
+      const start = parseTimeToMin(schedule[i].time);
+      const end = (i<schedule.length-1) ? parseTimeToMin(schedule[i+1].time) : 24*60+1;
+      if (start !== null && nowMin >= start && nowMin < end){ activeIndex=i; break; }
+    }
+
+    schedule.forEach((it, idx)=>{
+      const row = document.createElement("div");
+      row.className = "item";
+      row.style.borderColor = idx===activeIndex ? "var(--accent)" : "var(--border)";
+      row.style.background = idx===activeIndex ? "var(--soft)" : "#f9fafb";
+
+      row.innerHTML = `
+        <div style="min-width:92px"><input type="time" value="${it.time}"></div>
+        <div class="grow"><input type="text" value="${esc(it.label)}"></div>
+        <div><button class="ghost" title="Delete" type="button">🗑</button></div>
+      `;
+
+      row.querySelector("input[type='time']").addEventListener("change",(e)=>{
+        it.time = e.target.value; saveSchedule(); renderSchedule();
+      });
+      row.querySelector("input[type='text']").addEventListener("input",(e)=>{
+        it.label = e.target.value; saveSchedule(); updateNowNext();
+      });
+      row.querySelector("button").addEventListener("click",()=>{
+        schedule = schedule.filter(s=>s.id!==it.id); saveSchedule(); renderSchedule();
+      });
+
+      scheduleList.appendChild(row);
+    });
+
+    updateNowNext();
+  }
+
+  qs("#resetDay").addEventListener("click", ()=>{
+    schedule = JSON.parse(JSON.stringify(DEFAULT_SCHEDULE));
+    saveSchedule();
+    renderSchedule();
+  });
+
+  qs("#addItem").addEventListener("click", ()=>{
+    let t = qs("#addTime").value;
+    const label = qs("#addLabel").value.trim();
+    if (!label) return;
+
+    if (!t){
+      const d = new Date();
+      let m = d.getMinutes();
+      m = Math.round(m / 5) * 5;
+      if (m === 60){ d.setHours(d.getHours()+1); m = 0; }
+      t = String(d.getHours()).padStart(2,"0") + ":" + String(m).padStart(2,"0");
+    }
+
+    schedule.push({ id: uid(), time: t, label });
+    qs("#addLabel").value = "";
+    qs("#addTime").value = t;
+    saveSchedule();
+    renderSchedule();
+  });
+
+  // Classroom timer
+  let timer = { interval:null, remaining:0 };
+  function setTimerDisplay(sec){ qs("#timerDisplay").textContent = fmtTimer(Math.max(0,sec)); }
+  function initTimerFromInputs(){
+    const m = Number(qs("#min").value||0);
+    const s = Number(qs("#sec").value||0);
+    setTimerDisplay(m*60+s);
+  }
+  initTimerFromInputs();
+  qs("#min").addEventListener("input", initTimerFromInputs);
+  qs("#sec").addEventListener("input", initTimerFromInputs);
+
+  function beep(){
+    try{
+      const AC = window.AudioContext || window.webkitAudioContext;
+      const ctx = new AC();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "sine"; o.frequency.value = 880;
+      g.gain.value = 0.18;
+      o.connect(g); g.connect(ctx.destination);
+      o.start();
+      setTimeout(()=>{ o.stop(); ctx.close(); }, 220);
+    }catch(e){}
+  }
+
+  qs("#startBtn").addEventListener("click", ()=>{
+    const m = Number(qs("#min").value||0);
+    const s = Number(qs("#sec").value||0);
+    const total = m*60+s;
+    if (!total) return;
+    clearInterval(timer.interval);
+    timer.remaining = total;
+    setTimerDisplay(timer.remaining);
+    timer.interval = setInterval(()=>{
+      timer.remaining--;
+      if (timer.remaining <= 0){
+        clearInterval(timer.interval);
+        qs("#timerDisplay").textContent = "Time!";
+        beep();
+        return;
+      }
+      setTimerDisplay(timer.remaining);
+    }, 1000);
+  });
+  qs("#pauseBtn").addEventListener("click", ()=> clearInterval(timer.interval));
+  qs("#resetBtn").addEventListener("click", ()=>{
+    clearInterval(timer.interval);
+    initTimerFromInputs();
+  });
+
+  // Classroom notes
+  const cNotes = qs("#cNotes");
+  cNotes.value = store.get(KEY_C.notes, "");
+  let cSavedT = null;
+  cNotes.addEventListener("input", ()=>{
+    clearTimeout(cSavedT);
+    qs("#cSaved").textContent = "saving...";
+    cSavedT = setTimeout(()=>{
+      store.set(KEY_C.notes, cNotes.value);
+      qs("#cSaved").textContent = "saved";
+    }, 250);
+  });
+  qs("#clearCNotes").addEventListener("click", ()=>{
+    cNotes.value = "";
+    store.set(KEY_C.notes, "");
+    qs("#cSaved").textContent = "saved";
+  });
+
+  // ----- HOME -----
+  const KEY_H = {
+    routine:"lifehub.home.routines.v2",
+    routineDone:"lifehub.home.routines.done.v2",
+    chores:"lifehub.home.chores.v2",
+    groceries:"lifehub.home.groceries.v2",
+    meals:"lifehub.home.meals.v2",
+    notes:"lifehub.home.notes.v2",
+  };
+  const DAYS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+
+  function todayKey(){
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,"0");
+    const da = String(d.getDate()).padStart(2,"0");
+    return `${y}-${m}-${da}`;
+  }
+
+  const routineDefaults = {
+    morning: ["Water","Coffee/tea","Meds","Pack bag","Quick tidy (2 min)"],
+    evening: ["Dishes","Lay out clothes","Set alarms","Plan tomorrow (1 thing)"]
+  };
+
+  let routines = store.get(KEY_H.routine, routineDefaults);
+  if (!routines || typeof routines !== "object") routines = JSON.parse(JSON.stringify(routineDefaults));
+  if (!Array.isArray(routines.morning)) routines.morning = [...routineDefaults.morning];
+  if (!Array.isArray(routines.evening)) routines.evening = [...routineDefaults.evening];
+  store.set(KEY_H.routine, routines);
+
+  let routineDoneAll = store.get(KEY_H.routineDone, {});
+  if (!routineDoneAll || typeof routineDoneAll !== "object") routineDoneAll = {};
+  function ensureRoutineDoneToday(){
+    const k = todayKey();
+    if (!routineDoneAll[k]) routineDoneAll[k] = { morning:{}, evening:{} };
+    return { k, done: routineDoneAll[k] };
+  }
+
+  let routineMode = "morning";
+  const routineLabel = qs("#routineLabel");
+  const routineList = qs("#routineList");
+  function renderRoutine(){
+    routineLabel.textContent = routineMode;
+    routineList.innerHTML = "";
+    const { k, done } = ensureRoutineDoneToday();
+    const list = routines[routineMode] || [];
+    list.forEach((txt, idx)=>{
+      const id = `${routineMode}.${idx}`;
+      const checked = !!done[routineMode][id];
+      const row = document.createElement("div");
+      row.className = "item" + (checked ? " done" : "");
+      row.innerHTML = `
+        <input type="checkbox" ${checked?"checked":""} style="margin-top:3px" />
+        <div class="grow"><div style="font-weight:700">${esc(txt)}</div></div>
+        <button class="ghost" type="button" title="Remove">🗑</button>
+      `;
+      row.querySelector("input").addEventListener("change",(e)=>{
+        done[routineMode][id] = e.target.checked;
+        routineDoneAll[k] = done;
+        store.set(KEY_H.routineDone, routineDoneAll);
+        renderRoutine();
+      });
+      row.querySelector("button").addEventListener("click",()=>{
+        routines[routineMode].splice(idx,1);
+        store.set(KEY_H.routine, routines);
+        delete done[routineMode][id];
+        routineDoneAll[k] = done;
+        store.set(KEY_H.routineDone, routineDoneAll);
+        renderRoutine();
+      });
+      routineList.appendChild(row);
+    });
+  }
+
+  qsa("button[data-routine]").forEach(b=> b.addEventListener("click", ()=>{
+    routineMode = b.dataset.routine;
+    renderRoutine();
+  }));
+
+  qs("#routineAddBtn").addEventListener("click", ()=>{
+    const v = qs("#routineAdd").value.trim();
+    if (!v) return;
+    routines[routineMode].push(v);
+    store.set(KEY_H.routine, routines);
+    qs("#routineAdd").value = "";
+    renderRoutine();
+  });
+
+  qs("#routineReset").addEventListener("click", ()=>{
+    const { k, done } = ensureRoutineDoneToday();
+    done.morning = {}; done.evening = {};
+    routineDoneAll[k] = done;
+    store.set(KEY_H.routineDone, routineDoneAll);
+    renderRoutine();
+  });
+
+  // Chores
+  let chores = store.get(KEY_H.chores, []);
+  if (!Array.isArray(chores)) chores = [];
+  const choreList = qs("#choreList");
+  function renderChores(){
+    choreList.innerHTML = "";
+    chores.forEach((c, idx)=>{
+      const row = document.createElement("div");
+      row.className = "item" + (c.done ? " done" : "");
+      row.innerHTML = `
+        <input type="checkbox" ${c.done?"checked":""} style="margin-top:3px" />
+        <div class="grow">
+          <div style="font-weight:700">${esc(c.text)}</div>
+          ${c.due ? `<div class="sub" style="margin:4px 0 0"><span class="badge">${esc(c.due)}</span></div>` : ""}
+        </div>
+        <button class="ghost" type="button" title="Remove">🗑</button>
+      `;
+      row.querySelector("input").addEventListener("change",(e)=>{
+        c.done = e.target.checked; store.set(KEY_H.chores, chores); renderChores();
+      });
+      row.querySelector("button").addEventListener("click", ()=>{
+        chores.splice(idx,1); store.set(KEY_H.chores, chores); renderChores();
+      });
+      choreList.appendChild(row);
+    });
+  }
+  qs("#choreAddBtn").addEventListener("click", ()=>{
+    const text = qs("#choreText").value.trim();
+    const due = qs("#choreDue").value;
+    if (!text) return;
+    chores.unshift({ id: uid(), text, due, done:false });
+    qs("#choreText").value = ""; qs("#choreDue").value = "";
+    store.set(KEY_H.chores, chores); renderChores();
+  });
+  qs("#choreClearDone").addEventListener("click", ()=>{
+    chores = chores.filter(c=>!c.done);
+    store.set(KEY_H.chores, chores); renderChores();
+  });
+
+  // Groceries
+  let groceries = store.get(KEY_H.groceries, []);
+  if (!Array.isArray(groceries)) groceries = [];
+  const grocList = qs("#grocList");
+  function renderGroceries(){
+    grocList.innerHTML = "";
+    groceries.forEach((g, idx)=>{
+      const row = document.createElement("div");
+      row.className = "item" + (g.checked ? " done" : "");
+      row.innerHTML = `
+        <input type="checkbox" ${g.checked?"checked":""} style="margin-top:3px" />
+        <div class="grow"><div style="font-weight:700">${esc(g.text)}</div></div>
+        <button class="ghost" type="button" title="Remove">🗑</button>
+      `;
+      row.querySelector("input").addEventListener("change",(e)=>{
+        g.checked = e.target.checked; store.set(KEY_H.groceries, groceries); renderGroceries();
+      });
+      row.querySelector("button").addEventListener("click", ()=>{
+        groceries.splice(idx,1); store.set(KEY_H.groceries, groceries); renderGroceries();
+      });
+      grocList.appendChild(row);
+    });
+  }
+  qs("#grocAddBtn").addEventListener("click", ()=>{
+    const text = qs("#grocText").value.trim();
+    if (!text) return;
+    groceries.unshift({ id: uid(), text, checked:false });
+    store.set(KEY_H.groceries, groceries);
+    qs("#grocText").value = "";
+    renderGroceries();
+  });
+  qs("#grocClearChecked").addEventListener("click", ()=>{
+    groceries = groceries.filter(g=>!g.checked);
+    store.set(KEY_H.groceries, groceries); renderGroceries();
+  });
+  qs("#grocClearAll").addEventListener("click", ()=>{
+    groceries = [];
+    store.set(KEY_H.groceries, groceries); renderGroceries();
+  });
+
+  // Meals
+  let meals = store.get(KEY_H.meals, {});
+  if (!meals || typeof meals !== "object") meals = {};
+  const mealList = qs("#mealList");
+  function renderMeals(){
+    mealList.innerHTML = "";
+    DAYS.forEach(day=>{
+      const row = document.createElement("div");
+      row.className = "item";
+      row.innerHTML = `
+        <div style="min-width:54px;font-weight:800">${day}</div>
+        <div class="grow"><input type="text" value="${esc(meals[day] || "")}" placeholder="Meal idea..." /></div>
+      `;
+      row.querySelector("input").addEventListener("input",(e)=>{
+        meals[day] = e.target.value; store.set(KEY_H.meals, meals);
+      });
+      mealList.appendChild(row);
+    });
+  }
+  qs("#mealClear").addEventListener("click", ()=>{
+    meals = {}; store.set(KEY_H.meals, meals); renderMeals();
+  });
+
+  // Notes
+  let notes = store.get(KEY_H.notes, []);
+  if (!Array.isArray(notes)) notes = [];
+  const noteList = qs("#noteList");
+  function renderNotes(){
+    noteList.innerHTML = "";
+    notes.forEach((n, idx)=>{
+      const row = document.createElement("div");
+      row.className = "item";
+      row.innerHTML = `
+        <div class="grow">
+          ${n.title ? `<div style="font-weight:800">${esc(n.title)}</div>` : `<div style="font-weight:800">Note</div>`}
+          <div class="sub" style="white-space:pre-wrap;margin-top:6px">${esc(n.body)}</div>
+          <div class="sub" style="margin-top:6px">Saved: ${esc(n.when)}</div>
+        </div>
+        <button class="ghost" type="button" title="Delete">🗑</button>
+      `;
+      row.querySelector("button").addEventListener("click", ()=>{
+        notes.splice(idx,1); store.set(KEY_H.notes, notes); renderNotes();
+      });
+      noteList.appendChild(row);
+    });
+  }
+  qs("#noteAddBtn").addEventListener("click", ()=>{
+    const title = qs("#noteTitle").value.trim();
+    const body = qs("#noteBody").value.trim();
+    if (!body) return;
+    const when = new Date().toLocaleString([], {month:"short", day:"numeric", hour:"numeric", minute:"2-digit"});
+    notes.unshift({ id: uid(), title, body, when });
+    store.set(KEY_H.notes, notes);
+    qs("#noteTitle").value = ""; qs("#noteBody").value = "";
+    renderNotes();
+  });
+  qs("#noteClearDraft").addEventListener("click", ()=>{
+    qs("#noteTitle").value = ""; qs("#noteBody").value = "";
+  });
+
+  // Home timer
+  let t = { interval:null, remaining:0 };
+  function tInit(){
+    const m = Number(qs("#tMin").value||0);
+    const s = Number(qs("#tSec").value||0);
+    qs("#tDisp").textContent = fmtTimer(m*60+s);
+  }
+  tInit();
+  qs("#tMin").addEventListener("input", tInit);
+  qs("#tSec").addEventListener("input", tInit);
+  qs("#tStart").addEventListener("click", ()=>{
+    const m = Number(qs("#tMin").value||0);
+    const s = Number(qs("#tSec").value||0);
+    const total = m*60+s;
+    if (!total) return;
+    clearInterval(t.interval);
+    t.remaining = total;
+    qs("#tDisp").textContent = fmtTimer(t.remaining);
+    t.interval = setInterval(()=>{
+      t.remaining--;
+      if (t.remaining <= 0){
+        clearInterval(t.interval);
+        qs("#tDisp").textContent = "Time!";
+        beep();
+        return;
+      }
+      qs("#tDisp").textContent = fmtTimer(t.remaining);
+    }, 1000);
+  });
+  qs("#tPause").addEventListener("click", ()=> clearInterval(t.interval));
+  qs("#tReset").addEventListener("click", ()=>{
+    clearInterval(t.interval);
+    tInit();
+  });
+
+  // boot
+  renderSchedule();
+  setInterval(updateNowNext, 1000);
+  setInterval(renderSchedule, 15000);
+
+  renderRoutine();
+  renderChores();
+  renderGroceries();
+  renderMeals();
+  renderNotes();
+
+  setTab(store.get(KEY_UI.tab, "classroom"));
+</script>
+</body>
+</html>
