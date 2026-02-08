@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>LifeHub</title>
+
+  <!-- Optional cozy fonts (safe if blocked; falls back to system fonts) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Nunito:wght@600;700;800&family=Quicksand:wght@600;700&display=swap" rel="stylesheet">
+
   <style>
     :root{
       --bg:#f7f5fb;
@@ -17,8 +23,13 @@
       --border:#e5e7eb;
       --shadow:0 8px 18px rgba(0,0,0,.06);
       --radius:14px;
+
+      /* Fonts controlled by the Customize panel */
+      --fontBody: Inter;
+      --fontHead: "Baloo 2";
     }
-    *{box-sizing:border-box;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+
+    *{box-sizing:border-box;font-family:var(--fontBody),system-ui,-apple-system,"Segoe UI",sans-serif}
     body{margin:0;background:var(--bg);color:var(--text)}
     header{
       background:linear-gradient(135deg,#c7d2ff,#ffe0f0);
@@ -27,7 +38,7 @@
       position:sticky;top:0;z-index:50;
     }
     .header-inner{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
-    .title h1{margin:0;font-size:1.1rem;letter-spacing:.02em}
+    .title h1{margin:0;font-size:1.1rem;letter-spacing:.02em;font-family:var(--fontHead),var(--fontBody),system-ui,sans-serif}
     .title p{margin:2px 0 0;font-size:.85rem;color:var(--muted)}
     nav{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
     nav button{
@@ -42,9 +53,21 @@
     .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
     .card{
       background:var(--card);border-radius:var(--radius);padding:14px;
-      box-shadow:var(--shadow);border:1px solid rgba(0,0,0,.03)
+      box-shadow:var(--shadow);border:1px solid rgba(0,0,0,.03);
+      position:relative;
     }
-    .card h2{margin:0 0 8px;font-size:1rem;display:flex;align-items:center;gap:8px}
+    .card:before{
+      content:"";
+      position:absolute;left:0;top:0;bottom:0;width:8px;border-radius:14px 0 0 14px;
+      background:linear-gradient(180deg,var(--accent2),var(--accent));
+      opacity:.55;
+    }
+    .card > *{position:relative}
+    .card h2{
+      margin:0 0 8px;font-size:1rem;display:flex;align-items:center;gap:8px;
+      font-family:var(--fontHead),var(--fontBody),system-ui,sans-serif;
+      letter-spacing:.01em;
+    }
     .sub{margin:0 0 10px;font-size:.82rem;color:var(--muted)}
     .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
     .pill{display:inline-flex;gap:6px;align-items:center;padding:2px 8px;border-radius:999px;background:var(--soft);font-size:.72rem;color:var(--muted)}
@@ -76,6 +99,47 @@
     .timer-display{font-size:1.8rem;font-weight:700;letter-spacing:.08em;text-align:center;margin:6px 0 10px}
     .hidden{display:none !important}
     @media (max-width:640px){ .timer-display{font-size:1.5rem} }
+
+    /* ---------- Customize modal ---------- */
+    .modal-backdrop{
+      position:fixed;inset:0;background:rgba(15,23,42,.45);
+      display:none;align-items:flex-end;justify-content:center;
+      padding:16px;z-index:200;
+    }
+    .modal-backdrop.open{display:flex}
+    .modal{
+      width:min(720px, 100%);
+      background:rgba(255,255,255,.92);
+      backdrop-filter: blur(10px);
+      border:1px solid rgba(255,255,255,.35);
+      border-radius:18px;
+      box-shadow:0 18px 40px rgba(0,0,0,.22);
+      overflow:hidden;
+    }
+    .modal-header{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      padding:14px 14px;
+      background:linear-gradient(135deg,var(--accent2),var(--accent3));
+      border-bottom:1px solid rgba(0,0,0,.06);
+    }
+    .modal-header h3{
+      margin:0;font-size:1.05rem;font-family:var(--fontHead),var(--fontBody),system-ui,sans-serif;
+    }
+    .modal-body{padding:14px}
+    .two-col{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .swatch-row{display:flex;gap:8px;flex-wrap:wrap}
+    .swatch{
+      width:34px;height:34px;border-radius:12px;border:1px solid rgba(0,0,0,.10);
+      box-shadow:0 6px 14px rgba(0,0,0,.10);cursor:pointer;
+      outline:none;
+    }
+    .swatch[aria-checked="true"]{box-shadow:0 0 0 4px rgba(185,198,255,.75), 0 8px 18px rgba(0,0,0,.18)}
+    .small{font-size:.78rem;color:var(--muted);margin:6px 0 0}
+    .modal-footer{
+      display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;
+      padding:12px 14px;border-top:1px solid rgba(0,0,0,.06);
+      background:rgba(255,255,255,.75);
+    }
   </style>
 </head>
 <body>
@@ -88,6 +152,7 @@
     <nav>
       <button id="tabClass" class="active" type="button">🎒 Classroom</button>
       <button id="tabHome" type="button">🏠 Home</button>
+      <button id="openCustomize" type="button">✨ Customize</button>
     </nav>
   </div>
 </header>
@@ -284,6 +349,58 @@
   </section>
 </main>
 
+<!-- Customize modal -->
+<div class="modal-backdrop" id="customizeBackdrop" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal" role="document">
+    <div class="modal-header">
+      <h3>✨ Customize LifeHub</h3>
+      <button class="ghost" id="closeCustomize" type="button">Close</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="two-col">
+        <div class="card" style="box-shadow:none;border:1px solid rgba(0,0,0,.06)">
+          <h2>Palette</h2>
+          <p class="sub">Pick a cozy pastel set. Saves on this device.</p>
+          <div class="swatch-row" id="paletteSwatches" aria-label="palette choices"></div>
+          <p class="small">Tip: You can always go back to “Default.”</p>
+        </div>
+
+        <div class="card" style="box-shadow:none;border:1px solid rgba(0,0,0,.06)">
+          <h2>Fonts</h2>
+          <p class="sub">Bold headers, readable body.</p>
+          <label class="pill" style="margin-bottom:6px">Header font</label>
+          <select id="fontHeadSel">
+            <option value="Baloo 2">Baloo 2 (bubble)</option>
+            <option value="Nunito">Nunito (rounded)</option>
+            <option value="Quicksand">Quicksand (soft)</option>
+            <option value="Inter">Inter (clean)</option>
+          </select>
+          <div style="height:10px"></div>
+          <label class="pill" style="margin-bottom:6px">Body font</label>
+          <select id="fontBodySel">
+            <option value="Inter">Inter (clean)</option>
+            <option value="Nunito">Nunito (rounded)</option>
+            <option value="Quicksand">Quicksand (soft)</option>
+          </select>
+
+          <div style="height:10px"></div>
+          <label class="pill" style="margin-bottom:6px">Card accent bar</label>
+          <select id="accentStyleSel">
+            <option value="on">On</option>
+            <option value="off">Off</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="ghost" id="resetTheme" type="button">Reset to default</button>
+      <button class="primary" id="saveTheme" type="button">Save</button>
+    </div>
+  </div>
+</div>
+
 <script>
   function qs(sel, root=document){ return root.querySelector(sel); }
   function qsa(sel, root=document){ return [...root.querySelectorAll(sel)]; }
@@ -303,6 +420,139 @@
   }
   function uid(){ return Math.random().toString(16).slice(2) + Date.now().toString(16); }
   function esc(s){ return String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;"); }
+
+  // ---------------- THEME (Customize panel) ----------------
+  const THEME_KEY = "lifehub.ui.theme.v1";
+  const DEFAULT_THEME = {
+    paletteId: "default",
+    fontHead: "Baloo 2",
+    fontBody: "Inter",
+    accentBar: "on"
+  };
+
+  const PALETTES = [
+    { id:"default", name:"Default", vars:{ bg:"#f7f5fb", card:"#ffffff", text:"#1f2933", muted:"#6b7280", accent:"#b9c6ff", accent2:"#ffd6e8", accent3:"#c9f2e7", soft:"#eef2ff", border:"#e5e7eb" } },
+    { id:"pinkTea", name:"Pink Tea", vars:{ bg:"#fff5fb", card:"#ffffff", text:"#3a2433", muted:"#7a5a6e", accent:"#ffc6dd", accent2:"#ffe0f0", accent3:"#c9f2e7", soft:"#fff0f7", border:"#f0d6e3" } },
+    { id:"lavenderSky", name:"Lavender Sky", vars:{ bg:"#f6f4ff", card:"#ffffff", text:"#2f2a46", muted:"#6a6790", accent:"#c7d2ff", accent2:"#e7ddff", accent3:"#d6f5ef", soft:"#eef2ff", border:"#e5e7ff" } },
+    { id:"mintBerry", name:"Mint Berry", vars:{ bg:"#f2fffb", card:"#ffffff", text:"#1f2f2b", muted:"#557a70", accent:"#b9f5e7", accent2:"#ffd6e8", accent3:"#d6f5ef", soft:"#e9fff7", border:"#cfeee4" } },
+    { id:"sunset", name:"Soft Sunset", vars:{ bg:"#fff8f0", card:"#ffffff", text:"#3a2b1f", muted:"#7a6b5a", accent:"#ffd9b8", accent2:"#ffe0f0", accent3:"#c7d2ff", soft:"#fff1e6", border:"#f0e0d3" } },
+  ];
+
+  function applyTheme(t){
+    const palette = PALETTES.find(p=>p.id===t.paletteId) || PALETTES[0];
+    const vars = palette.vars;
+
+    const root = document.documentElement.style;
+    Object.entries(vars).forEach(([k,v])=> root.setProperty(`--${k}`, v));
+    root.setProperty("--fontHead", t.fontHead || DEFAULT_THEME.fontHead);
+    root.setProperty("--fontBody", t.fontBody || DEFAULT_THEME.fontBody);
+
+    // Accent bar toggle
+    const on = (t.accentBar || "on") === "on";
+    qsa(".card").forEach(card=>{
+      card.style.setProperty("--accentBarOpacity", on ? ".55" : "0");
+    });
+
+    // Use a CSS trick: set opacity via inline style hook
+    const styleElId = "accentBarToggleStyle";
+    let styleEl = document.getElementById(styleElId);
+    if (!styleEl){
+      styleEl = document.createElement("style");
+      styleEl.id = styleElId;
+      document.head.appendChild(styleEl);
+    }
+    styleEl.textContent = on
+      ? `.card:before{opacity:.55}`
+      : `.card:before{opacity:0}`;
+  }
+
+  function getTheme(){
+    const saved = store.get(THEME_KEY, null);
+    return saved && typeof saved === "object" ? { ...DEFAULT_THEME, ...saved } : { ...DEFAULT_THEME };
+  }
+
+  function setTheme(t){
+    store.set(THEME_KEY, t);
+    applyTheme(t);
+  }
+
+  // Modal wiring
+  const backdrop = qs("#customizeBackdrop");
+  const openBtn = qs("#openCustomize");
+  const closeBtn = qs("#closeCustomize");
+  const saveBtn = qs("#saveTheme");
+  const resetBtn = qs("#resetTheme");
+  const paletteWrap = qs("#paletteSwatches");
+  const fontHeadSel = qs("#fontHeadSel");
+  const fontBodySel = qs("#fontBodySel");
+  const accentStyleSel = qs("#accentStyleSel");
+
+  let draftTheme = getTheme();
+
+  function openModal(){
+    draftTheme = getTheme();
+    syncModalFromTheme(draftTheme);
+    backdrop.classList.add("open");
+    backdrop.setAttribute("aria-hidden","false");
+  }
+  function closeModal(){
+    backdrop.classList.remove("open");
+    backdrop.setAttribute("aria-hidden","true");
+  }
+  openBtn.addEventListener("click", openModal);
+  closeBtn.addEventListener("click", closeModal);
+  backdrop.addEventListener("click", (e)=>{ if (e.target === backdrop) closeModal(); });
+  document.addEventListener("keydown", (e)=>{ if (e.key === "Escape" && backdrop.classList.contains("open")) closeModal(); });
+
+  function makeSwatch(p){
+    const b = document.createElement("button");
+    b.className = "swatch";
+    b.type = "button";
+    b.title = p.name;
+    b.style.background = `linear-gradient(135deg, ${p.vars.accent2}, ${p.vars.accent}, ${p.vars.accent3})`;
+    b.setAttribute("role","radio");
+    b.setAttribute("aria-checked","false");
+    b.addEventListener("click", ()=>{
+      draftTheme.paletteId = p.id;
+      syncModalFromTheme(draftTheme);
+    });
+    return b;
+  }
+
+  function renderPaletteSwatches(){
+    paletteWrap.innerHTML = "";
+    PALETTES.forEach(p=> paletteWrap.appendChild(makeSwatch(p)));
+  }
+
+  function syncModalFromTheme(t){
+    // swatches
+    qsa(".swatch", paletteWrap).forEach((sw, idx)=>{
+      const p = PALETTES[idx];
+      sw.setAttribute("aria-checked", p.id === t.paletteId ? "true" : "false");
+    });
+    fontHeadSel.value = t.fontHead;
+    fontBodySel.value = t.fontBody;
+    accentStyleSel.value = t.accentBar;
+  }
+
+  renderPaletteSwatches();
+
+  fontHeadSel.addEventListener("change", ()=>{ draftTheme.fontHead = fontHeadSel.value; });
+  fontBodySel.addEventListener("change", ()=>{ draftTheme.fontBody = fontBodySel.value; });
+  accentStyleSel.addEventListener("change", ()=>{ draftTheme.accentBar = accentStyleSel.value; });
+
+  saveBtn.addEventListener("click", ()=>{
+    setTheme(draftTheme);
+    closeModal();
+  });
+
+  resetBtn.addEventListener("click", ()=>{
+    setTheme({ ...DEFAULT_THEME });
+    closeModal();
+  });
+
+  // Apply saved theme immediately on load
+  applyTheme(getTheme());
 
   // Tabs (and force re-render on switch so nothing feels "stale")
   const KEY_UI = { tab:"lifehub.ui.tab.v2" };
@@ -400,8 +650,8 @@
     schedule.forEach((it, idx)=>{
       const row = document.createElement("div");
       row.className = "item";
-      row.style.borderColor = idx===activeIndex ? "#c7d2ff" : "var(--border)";
-      row.style.background = idx===activeIndex ? "#eef2ff" : "#f9fafb";
+      row.style.borderColor = idx===activeIndex ? "var(--accent)" : "var(--border)";
+      row.style.background = idx===activeIndex ? "var(--soft)" : "#f9fafb";
 
       row.innerHTML = `
         <div style="min-width:92px"><input type="time" value="${it.time}"></div>
@@ -431,7 +681,7 @@
     renderSchedule();
   });
 
-  // FIX: Always add (auto-fill time if blank)
+  // Always add (auto-fill time if blank)
   qs("#addItem").addEventListener("click", ()=>{
     let t = qs("#addTime").value;
     const label = qs("#addLabel").value.trim();
